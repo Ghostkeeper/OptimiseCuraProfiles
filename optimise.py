@@ -158,6 +158,7 @@ def parse(file):
 		return parse_json(file)
 	if extension == "xml":
 		return parse_xml(file)
+	raise Exception("Unknown file extension \"{extension}\".".format(extension=extension))
 
 def parse_cfg(file):
 	"""

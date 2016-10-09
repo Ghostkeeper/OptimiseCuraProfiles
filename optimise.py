@@ -12,6 +12,7 @@ For usage instructions, run the script with the "--help" parameter.
 
 import argparse #To parse the input and output directories.
 import collections #For namedtuple.
+import copy #Cloning profiles.
 import logging
 import os #To get the current working directory as defaults for input and output, and for file path operations.
 
@@ -133,7 +134,13 @@ def flatten(profile, parent=None):
 	input file is returned.
 	:return: A flattened profile.
 	"""
-	raise Exception("Not implemented yet.")
+	result = copy.copy(profile)
+	if not parent:
+		return result #Nothing to inherit.
+	for key, value in parent.settings.items():
+		if key not in result.settings: #Only inherit settings that are not specified in the profile itself.
+			result.settings[key] = value
+	return result
 
 def parse(file):
 	"""

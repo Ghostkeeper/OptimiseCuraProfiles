@@ -151,12 +151,11 @@ def parse(file):
 	file.
 	"""
 	extension = os.path.splitext(file)[1]
-	print(extension)
-	if extension == "cfg":
+	if extension == ".cfg":
 		return parse_cfg(file)
-	if extension == "json":
+	if extension == ".json":
 		return parse_json(file)
-	if extension == "xml":
+	if extension == ".xml":
 		return parse_xml(file)
 	raise Exception("Unknown file extension \"{extension}\".".format(extension=extension))
 

@@ -12,13 +12,14 @@ For usage instructions, run the script with the "--help" parameter.
 
 import argparse #To parse the input and output directories.
 import collections #For namedtuple.
+import configparser #To parse and write .cfg files.
 import copy #Cloning profiles.
 import logging
 import os #To get the current working directory as defaults for input and output, and for file path operations.
 
 #Global configuration stuff.
 logging.basicConfig(level=logging.DEBUG)
-Profile = collections.namedtuple("Profile", "filepath settings subprofiles") #Filepath is a path string. Settings is a dictionary of settings. Subprofiles is a set of other Profile instances.
+Profile = collections.namedtuple("Profile", "filepath settings subprofiles baseconfig") #Filepath is a path string. Settings is a dictionary of settings. Subprofiles is a set of other Profile instances. Baseconfig is a configparser instance without the settings filled in.
 
 def optimise(input_dir, output_dir):
 	"""
@@ -66,7 +67,8 @@ def get_profiles(input_dir):
 				directory_node = Profile(
 					filepath=os.path.join(directory, this_directory + ".inst.cfg"),
 					settings={},
-					subprofiles=[]
+					subprofiles=[],
+					baseconfig=configparser.ConfigParser()
 				)
 			if len(call_stack) > 0:
 				call_stack[-1].subprofiles.append(directory_node)

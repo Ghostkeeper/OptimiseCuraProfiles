@@ -51,8 +51,7 @@ def get_profiles(input_dir):
 			this_directory = os.path.dirname(directory)
 			for file in files:
 				if file.split(".")[0] == this_directory: #Named similarly.
-					directory_node = parse(file)
-					flatten(directory_node)
+					directory_node = flatten(parse(file))
 					break
 			else: #There was no common file for this directory.
 				directory_node = Profile(
@@ -122,6 +121,43 @@ def flatten(profile):
 def parse(file):
 	"""
 	Parses one file, creating a Profile instance with all settings from the
+	file.
+	:param file: The file path of the file to parse.
+	:return: A Profile instance, instantiated with all the settings from the
+	file.
+	"""
+	extension = os.path.splitext(file)[1]
+	print(extension)
+	if extension == "cfg":
+		return parse_cfg(file)
+	if extension == "json":
+		return parse_json(file)
+	if extension == "xml":
+		return parse_xml(file)
+
+def parse_cfg(file):
+	"""
+	Parses a CFG file, creating a Profile instance with all settings from the
+	file.
+	:param file: The file path of the file to parse.
+	:return: A Profile instance, instantiated with all the settings from the
+	file.
+	"""
+	raise Exception("Not implemented yet.")
+
+def parse_json(file):
+	"""
+	Parses a JSON file, creating a Profile instance with all settings from the
+	file.
+	:param file: The file path of the file to parse.
+	:return: A Profile instance, instantiated with all the settings from the
+	file.
+	"""
+	raise Exception("Not implemented yet.")
+
+def parse_xml(file):
+	"""
+	Parses an XML file, creating a Profile instance with all settings from the
 	file.
 	:param file: The file path of the file to parse.
 	:return: A Profile instance, instantiated with all the settings from the

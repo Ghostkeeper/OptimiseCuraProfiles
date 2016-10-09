@@ -46,23 +46,39 @@ def get_profiles(input_dir):
 	:return: The root profile of the profile structure in the input directory.
 	"""
 	logging.info("Reading profiles.")
+	call_stack = collections.deque()
 	for directory, subdirectories, files in os.walk(input_dir):
+		depth = len(os.path.split(directory))
+		while(len(call_stack)) > depth:
+			call_stack.pop()
 		if subdirectories: #Not a leaf node. Look for a file that is named like the folder.
 			this_directory = os.path.dirname(directory)
 			for file in files:
 				if file.split(".")[0] == this_directory: #Named similarly.
-					directory_node = flatten(parse(file))
+					if len(call_stack) > 0:
+						parent = call_stack[-1]
+					else:
+						parent = None
+					directory_node = flatten(parse(file), parent)
 					break
 			else: #There was no common file for this directory.
 				directory_node = Profile(
 					filepath=os.path.join(directory, this_directory + ".inst.cfg"),
 					settings={},
-					subprofiles=set()
+					subprofiles=[]
 				)
-			yield directory_node
+			if len(call_stack) > 0:
+				call_stack[-1].subprofiles.append(directory_node)
+			call_stack.append(directory_node)
 		else: #Leaf node. Find all the rest of the profiles.
 			for file in files:
-				yield flatten(parse(file))
+				if len(call_stack) > 0:
+					profile = flatten(parse(file), call_stack[-1])
+					call_stack[-1].subprofiles.append(profile)
+				else:
+					profile = flatten(parse(file), None)
+					call_stack.append(profile) #TODO: If the root directory is a leaf file, this only returns the first file.
+	return call_stack[0]
 
 def bubble_common_values(profile_root):
 	"""
@@ -106,14 +122,15 @@ def write_profiles(output_dir, profile_root):
 
 #################################SUBROUTINES####################################
 
-def flatten(profile):
+def flatten(profile, parent=None):
 	"""
 	Flattens a profile, instantiating all settings that it inherits from its
 	parents.
 
-	Its parent is obtained from the profile's filepath. Its parent must already
-	be flattened when calling this function.
+	The parent must already be flattened when calling this function.
 	:param profile: The profile to flatten.
+	:param parent: The parent of this profile. If not provided, a copy of the
+	input file is returned.
 	:return: A flattened profile.
 	"""
 	raise Exception("Not implemented yet.")

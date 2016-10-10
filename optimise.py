@@ -134,6 +134,9 @@ def bubble_common_values(profile, except_root=False):
 		for value, count in value_counts.items():
 			if count > highest_count:
 				most_common_value = value
+			elif count == highest_count: #We have a tie.
+				if value < most_common_value: #Just to make it deterministic.
+					most_common_value = value
 		profile.settings[key] = most_common_value
 
 def remove_redundancies(profile, parent=None):

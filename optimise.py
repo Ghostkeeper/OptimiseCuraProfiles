@@ -49,35 +49,33 @@ def get_profiles(input_dir):
 	:return: The root profile of the profile structure in the input directory.
 	"""
 	logging.info("Reading profiles.")
-	call_stack = collections.deque()
-	for directory, subdirectories, files in os.walk(input_dir):
-		depth = len(os.path.split(directory))
-		while(len(call_stack)) > depth:
-			call_stack.pop()
-		if subdirectories: #Not a leaf node. Look for a file that is named like the folder.
-			this_directory = os.path.split(directory)[-1]
-			for file in files:
-				if file.split(".")[0] == this_directory: #Named similarly.
-					directory_node = parse(os.path.join(directory, file))
-					break
-			else: #There was no common file for this directory.
-				directory_node = Profile(
-					filepath=os.path.join(directory, this_directory + ".inst.cfg"),
-					settings={},
-					subprofiles=[],
-					baseconfig=configparser.ConfigParser()
-				)
-			if len(call_stack) > 0:
-				call_stack[-1].subprofiles.append(directory_node)
-			call_stack.append(directory_node)
-		else: #Leaf node. Find all the rest of the profiles.
-			for file in files:
-				profile = parse(os.path.join(directory, file))
-				if len(call_stack) > 0:
-					call_stack[-1].subprofiles.append(profile)
-				else:
-					call_stack.append(profile) #TODO: If the root directory is a leaf file, this only returns the first file.
-	return call_stack[0]
+
+	files = [file for file in os.listdir(input_dir) if os.path.isfile(os.path.join(input_dir, file))]
+	directories = [directory for directory in os.listdir(input_dir) if os.path.isdir(os.path.join(input_dir, directory))]
+
+	#Find the base file.
+	this_directory = os.path.split(input_dir)[-1]
+	for file in files:
+		if file.split(".")[0] == this_directory: #Named similarly.
+			base_profile = parse(os.path.join(input_dir, file))
+			break
+	else: #There was no common file for this directory.
+		base_profile = Profile(
+			filepath=os.path.join(input_dir, this_directory + ".inst.cfg"),
+			settings={},
+			subprofiles=[],
+			baseconfig=configparser.ConfigParser()
+		)
+
+	if directories: #Not a leaf node.
+		for directory in directories:
+			base_profile.subprofiles.append(get_profiles(os.path.join(input_dir, directory)))
+	else: #Leaf node.
+		for file in files:
+			profile = parse(os.path.join(input_dir, file)) #Act as if every file is in its own subdirectory.
+			base_profile.subprofiles.append(profile)
+
+	return base_profile
 
 def flatten_profiles(profile, parent=None):
 	"""

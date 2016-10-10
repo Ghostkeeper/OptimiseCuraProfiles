@@ -295,5 +295,5 @@ if __name__ == "__main__":
 	argument_parser.add_argument("-o", dest="output_dir", help="Root directory of output profile structure.", default=os.getcwd())
 	arguments = argument_parser.parse_args()
 	if arguments.input_dir == arguments.output_dir:
-		raise Exception("Input and output directories may not be the same (both were '{dir}').".format(dir=arguments.input_dir))
+		raise Exception("Input and output directories may not be the same (both were \"{dir}\").".format(dir=arguments.input_dir))
 	optimise(arguments.input_dir, arguments.output_dir)

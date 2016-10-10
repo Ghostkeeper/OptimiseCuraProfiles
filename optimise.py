@@ -207,14 +207,14 @@ def parse_cfg(file):
 		baseconfig=configparser.ConfigParser()
 	)
 
-	config = configparser.ConfigParser() #Input file.
-	config.read(file)
-	if config.has_section("general"): #Copy over all metadata.
-		result.baseconfig["general"] = config["general"]
-	if config.has_section("metadata"):
-		result.baseconfig["metadata"] = config["metadata"]
-	if config.has_section("values"): #Put the settings in the settings dict for further processing later.
-		for key, value in config["values"].items():
+	data = configparser.ConfigParser() #Input file.
+	data.read(file)
+	if data.has_section("general"): #Copy over all metadata.
+		result.baseconfig["general"] = data["general"]
+	if data.has_section("metadata"):
+		result.baseconfig["metadata"] = data["metadata"]
+	if data.has_section("values"): #Put the settings in the settings dict for further processing later.
+		for key, value in data["values"].items():
 			result.settings[key] = value
 	return result
 

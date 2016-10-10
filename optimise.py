@@ -68,7 +68,9 @@ def get_profiles(input_dir):
 	logging.info("Reading profiles in {directory}.".format(directory=input_dir))
 
 	files = [file for file in os.listdir(input_dir) if os.path.isfile(os.path.join(input_dir, file))]
+	files.sort()
 	directories = [directory for directory in os.listdir(input_dir) if os.path.isdir(os.path.join(input_dir, directory))]
+	directories.sort()
 
 	#Find the base file.
 	this_directory = os.path.split(input_dir)[-1]

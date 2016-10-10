@@ -20,6 +20,16 @@ import os #To get the current working directory as defaults for input and output
 #Global configuration stuff.
 logging.basicConfig(level=logging.DEBUG)
 Profile = collections.namedtuple("Profile", "filepath settings subprofiles baseconfig") #Filepath is a path string. Settings is a dictionary of settings. Subprofiles is a set of other Profile instances. Baseconfig is a configparser instance without the settings filled in.
+material_profiles = {"PLA", "ABS", "CPE", "Nylon", "PVA"} #Material profiles can only have material settings. TODO: Don't hard-code these, but get them based on XML input.
+material_settings = {
+	"material_print_temperature": "print temperature",
+	"material_bed_temperature": "heated bed temperature",
+	"material_standby_temperature": "standby temperature",
+	"material_flow_temp_graph": "processing temperature graph",
+	"cool_fan_speed": "print cooling",
+	"retraction_amount": "retraction amount",
+	"retraction_speed": "retraction speed"
+}
 
 def optimise(input_dir, output_dir):
 	"""
@@ -126,11 +136,27 @@ def bubble_common_values(profile, except_root=False):
 	#For every key, find the most common value among its children.
 	for key in profile.settings:
 		value_counts = {}
-		for subprofile in profile.subprofiles:
-			value = subprofile.settings[key]
-			if value not in value_counts:
-				value_counts[value] = 0
-			value_counts[value] += 1
+		if key in material_settings:
+			for subprofile in profile.subprofiles:
+				value = subprofile.settings[key]
+				if value not in value_counts:
+					value_counts[value] = 0
+				value_counts[value] += 1
+		else: #Setting may not occur in a material profile. Skip all material profiles in the bubbling.
+			for subprofile in profile.subprofiles:
+				if is_material(subprofile): #This is a material profile.
+					for subsubprofile in subprofile.subprofiles: #Look in all its grandchildren. TODO: Make it possible to have multiple material profiles in the chain.
+						value = subsubprofile.settings[key]
+						if value not in value_counts:
+							value_counts[value] = 0
+						value_counts[value] += 1
+				else:
+					value = subprofile.settings[key]
+					if value not in value_counts:
+						value_counts[value] = 0
+					value_counts[value] += 1
+				if key == "acceleration_enabled":
+					print(value_counts)
 		most_common_value = None
 		highest_count = -1
 		for value, count in value_counts.items():
@@ -161,8 +187,12 @@ def remove_redundancies(profile, parent=None):
 	#Remove settings that are the same as the parent.
 	redundancies = set()
 	for key in profile.settings:
+		if key not in material_settings and is_material(profile):
+			redundancies.add(key)
+			continue
 		if profile.settings[key] == parent.settings[key]:
 			redundancies.add(key)
+			continue
 	for key in redundancies:
 		del profile.settings[key]
 
@@ -182,6 +212,14 @@ def write_profiles(output_dir, profile):
 		write_profiles(output_dir, subprofile)
 
 #################################SUBROUTINES####################################
+
+def is_material(profile):
+	"""
+	Determines whether a profile is a material profile.
+	:param profile: The profile to check.
+	:return: True if the profile is a material profile, or False if it isn't.
+	"""
+	return os.path.split(profile.filepath)[-1].split(".")[0] in material_profiles
 
 def parse(file):
 	"""
@@ -291,7 +329,11 @@ def write_cfg(profile, output_dir):
 	config.add_section("values")
 	sorted_keys = sorted(profile.settings)
 	for key in sorted_keys: #Serialise the settings to the config.
-		config["values"][key] = profile.settings[key]
+		try:
+			config["values"][key] = profile.settings[key]
+		except Exception as e:
+			print(key, ":", profile.settings[key])
+			raise e
 
 	if not os.path.exists(os.path.dirname(os.path.join(output_dir, profile.filepath))):
 		os.makedirs(os.path.dirname(os.path.join(output_dir, profile.filepath)))

@@ -83,7 +83,7 @@ def get_profiles(input_dir):
 					call_stack.append(profile) #TODO: If the root directory is a leaf file, this only returns the first file.
 	return call_stack[0]
 
-def bubble_common_values(profile_root):
+def bubble_common_values(profile):
 	"""
 	Finds the common denominator of the profiles in each subgroup, and bubbles
 	them up.
@@ -93,11 +93,31 @@ def bubble_common_values(profile_root):
 	redundancies to be removed in the ``remove_redundancies`` function.
 
 	The provided root profile is modified to this end.
-	:param profile_root: The root profile, containing all profiles as
+	:param profile: The root profile, containing all profiles as
 	subprofiles.
 	"""
-	logging.info("Finding common denominators.")
-	raise Exception("Not implemented yet.")
+	logging.info("Finding common denominators of {file}.".format(file=profile.filepath))
+	#First tail-recursively bubble all subprofiles.
+	for subprofile in profile.subprofiles:
+		bubble_common_values(subprofile)
+	#Edge case: No subprofiles.
+	if not profile.subprofiles:
+		return #We are already the common denominator then.
+
+	#For every key, find the most common value among its children.
+	for key in profile.settings:
+		value_counts = {}
+		for subprofile in profile.subprofiles:
+			value = subprofile.settings[key]
+			if value not in value_counts:
+				value_counts[value] = 0
+			value_counts[value] += 1
+		most_common_value = None
+		highest_count = -1
+		for value, count in value_counts.items():
+			if count > highest_count:
+				most_common_value = value
+		profile.settings[key] = most_common_value
 
 def remove_redundancies(profile_root):
 	"""

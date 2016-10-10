@@ -241,6 +241,9 @@ def parse_json(file):
 	if "settings" in data:
 		for key, value in parse_json_setting(data["settings"]):
 			result.settings[key] = value
+	if "overrides" in data:
+		for key, value in parse_json_setting(data["overrides"]):
+			result.settings[key] = value
 
 	return result
 

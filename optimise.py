@@ -90,11 +90,10 @@ def flatten_profiles(profile, parent=None):
 	input file is returned.
 	"""
 	logging.info("Flattening {file}.".format(file=profile.filepath))
-	if not parent:
-		return #Nothing to inherit.
-	for key, value in parent.settings.items():
-		if key not in profile.settings: #Only inherit settings that are not specified in the profile itself.
-			profile.settings[key] = value
+	if parent:
+		for key, value in parent.settings.items():
+			if key not in profile.settings: #Only inherit settings that are not specified in the profile itself.
+				profile.settings[key] = value
 
 	for subprofile in profile.subprofiles:
 		flatten_profiles(subprofile, profile)

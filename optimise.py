@@ -119,16 +119,27 @@ def bubble_common_values(profile):
 				most_common_value = value
 		profile.settings[key] = most_common_value
 
-def remove_redundancies(profile_root):
+def remove_redundancies(profile, parent=None):
 	"""
 	Removes the settings in each profile that have the same value as its parent.
 
 	The provided root profile is modified to this end.
-	:param profile_root: The root profile, containing all profiles as
-	subprofiles.
+	:param profile: The profile to remove redundancies from, containing all
+	profiles as subprofiles.
+	:param parent: The parent profile of the specified profile, if any.
 	"""
-	logging.info("Removing redundancies.")
-	raise Exception("Not implemented yet.")
+	logging.info("Removing redundancies of {file}.".format(file=profile.filepath))
+	#First tail-recursively remove redundancies of all subprofiles.
+	for subprofile in profile.subprofiles:
+		remove_redundancies(subprofile, parent=profile)
+	#Edge case: Root file has no redundancies.
+	if not parent:
+		return
+
+	#Remove settings that are the same as the parent.
+	for key in profile.settings:
+		if profile.settings[key] == parent.settings[key]:
+			del profile.settings[key]
 
 def write_profiles(output_dir, profile_root):
 	"""

@@ -33,9 +33,9 @@ def optimise(input_dir, output_dir):
 	:param output_dir: The root directory of the output profile structure.
 	"""
 	profile_root = get_profiles(input_dir)
+	write_profiles(output_dir, profile_root)
 	bubble_common_values(profile_root)
 	remove_redundancies(profile_root)
-	write_profiles(output_dir, profile_root)
 
 #################################MAIN STAGES####################################
 
@@ -282,7 +282,7 @@ def write_cfg(profile):
 	for key, value in profile.settings.items(): #Serialise the settings to the config.
 		config["values"][key] = value
 
-	with open(profile.filepath) as config_file: #Write the config file itself.
+	with open(profile.filepath, "w") as config_file: #Write the config file itself.
 		config.write(config_file)
 
 if __name__ == "__main__":

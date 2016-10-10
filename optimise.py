@@ -14,6 +14,7 @@ import argparse #To parse the input and output directories.
 import collections #For namedtuple.
 import configparser #To parse and write .cfg files.
 import copy #Cloning profiles.
+import json #To parse .json files.
 import logging
 import os #To get the current working directory as defaults for input and output, and for file path operations.
 
@@ -226,7 +227,36 @@ def parse_json(file):
 	:return: A Profile instance, instantiated with all the settings from the
 	file.
 	"""
-	raise Exception("Not implemented yet.")
+	result = Profile( #An empty profile.
+		filepath=file,
+		settings={},
+		subprofiles=[],
+		baseconfig=configparser.ConfigParser() #TODO: Make this base config a basic JSON file if we're going to be writing JSON as well.
+	)
+	with open(file) as json_file:
+		data = json.load(json_file)
+
+	if "settings" in data:
+		for key, value in parse_json_setting(data["settings"]):
+			result.settings[key] = value
+
+	return result
+
+def parse_json_setting(setting_dict):
+	"""
+	Parses a setting in a JSON file.
+	:param setting_dict: A dictionary representing the setting as it appears in
+	the JSON file.
+	:return: A generator over all key-value pairs in the setting and its
+	subsettings.
+	"""
+	for key, subdict in setting_dict.items():
+		if "default_value" in subdict:
+			yield key, subdict["default_value"]
+		elif "value" in subdict: #default_value overrides value.
+			yield key, subdict["value"]
+		if "children" in subdict: #Recursively yield from child settings.
+			yield from parse_json_setting(subdict["children"])
 
 def parse_xml(file):
 	"""

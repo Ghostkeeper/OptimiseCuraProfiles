@@ -33,9 +33,9 @@ def optimise(input_dir, output_dir):
 	"""
 	profile_root = get_profiles(input_dir)
 	flatten_profiles(profile_root)
-	write_profiles(output_dir, profile_root)
 	bubble_common_values(profile_root)
 	remove_redundancies(profile_root)
+	write_profiles(output_dir, profile_root)
 
 #################################MAIN STAGES####################################
 

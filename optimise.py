@@ -96,10 +96,10 @@ def bubble_common_values(profile):
 	:param profile: The root profile, containing all profiles as
 	subprofiles.
 	"""
-	logging.info("Finding common denominators of {file}.".format(file=profile.filepath))
 	#First tail-recursively bubble all subprofiles.
 	for subprofile in profile.subprofiles:
 		bubble_common_values(subprofile)
+	logging.info("Finding common denominators of {file}.".format(file=profile.filepath))
 	#Edge case: No subprofiles.
 	if not profile.subprofiles:
 		return #We are already the common denominator then.
@@ -128,10 +128,10 @@ def remove_redundancies(profile, parent=None):
 	profiles as subprofiles.
 	:param parent: The parent profile of the specified profile, if any.
 	"""
-	logging.info("Removing redundancies of {file}.".format(file=profile.filepath))
 	#First tail-recursively remove redundancies of all subprofiles.
 	for subprofile in profile.subprofiles:
 		remove_redundancies(subprofile, parent=profile)
+	logging.info("Removing redundancies of {file}.".format(file=profile.filepath))
 	#Edge case: Root file has no redundancies.
 	if not parent:
 		return

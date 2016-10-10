@@ -13,7 +13,6 @@ For usage instructions, run the script with the "--help" parameter.
 import argparse #To parse the input and output directories.
 import collections #For namedtuple.
 import configparser #To parse and write .cfg files.
-import copy #Cloning profiles.
 import json #To parse .json files.
 import logging
 import os #To get the current working directory as defaults for input and output, and for file path operations.

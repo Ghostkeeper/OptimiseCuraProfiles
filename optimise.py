@@ -152,7 +152,7 @@ def write_profiles(output_dir, profile):
 	:param profile: The root profile, containing all profiles as
 	subprofiles.
 	"""
-	logging.info("Writing optimised profiles.")
+	logging.info("Writing optimised profile: {file}".format(file=profile.filepath))
 	write_cfg(profile, output_dir)
 	for subprofile in profile.subprofiles:
 		write_profiles(output_dir, subprofile)

@@ -284,6 +284,8 @@ def write_cfg(profile, output_dir):
 	for key, value in profile.settings.items(): #Serialise the settings to the config.
 		config["values"][key] = value
 
+	if not os.path.exists(os.path.dirname(os.path.join(output_dir, profile.filepath))):
+		os.makedirs(os.path.dirname(os.path.join(output_dir, profile.filepath)))
 	with open(os.path.join(output_dir, profile.filepath), "w") as config_file: #Write the config file itself.
 		config.write(config_file)
 

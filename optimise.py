@@ -33,7 +33,7 @@ def optimise(input_dir, output_dir):
 	"""
 	profile_root = get_profiles(input_dir)
 	flatten_profiles(profile_root)
-	bubble_common_values(profile_root)
+	bubble_common_values(profile_root, except_root=True)
 	remove_redundancies(profile_root)
 	write_profiles(output_dir, profile_root)
 
@@ -96,7 +96,7 @@ def flatten_profiles(profile, parent=None):
 	for subprofile in profile.subprofiles:
 		flatten_profiles(subprofile, profile)
 
-def bubble_common_values(profile):
+def bubble_common_values(profile, except_root=False):
 	"""
 	Finds the common denominator of the profiles in each subgroup, and bubbles
 	them up.
@@ -108,10 +108,14 @@ def bubble_common_values(profile):
 	The provided root profile is modified to this end.
 	:param profile: The root profile, containing all profiles as
 	subprofiles.
+	:param except_root: Whether we should prevent making changes to the root of
+	the profile tree.
 	"""
 	#First tail-recursively bubble all subprofiles.
 	for subprofile in profile.subprofiles:
 		bubble_common_values(subprofile)
+	if except_root: #We've already done our children, but we want to exempt the root of the tree, which is this node.
+		return
 	logging.info("Finding common denominators of {file}.".format(file=profile.filepath))
 	#Edge case: No subprofiles.
 	if not profile.subprofiles:

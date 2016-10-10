@@ -254,9 +254,9 @@ def parse_json_setting(setting_dict):
 	"""
 	for key, subdict in setting_dict.items():
 		if "default_value" in subdict:
-			yield key, subdict["default_value"]
+			yield key, str(subdict["default_value"])
 		elif "value" in subdict: #default_value overrides value.
-			yield key, subdict["value"]
+			yield key, str(subdict["value"])
 		if "children" in subdict: #Recursively yield from child settings.
 			yield from parse_json_setting(subdict["children"])
 

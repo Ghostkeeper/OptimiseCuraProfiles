@@ -33,6 +33,7 @@ def optimise(input_dir, output_dir):
 	:param output_dir: The root directory of the output profile structure.
 	"""
 	profile_root = get_profiles(input_dir)
+	flatten_profiles(profile_root)
 	write_profiles(output_dir, profile_root)
 	bubble_common_values(profile_root)
 	remove_redundancies(profile_root)
@@ -58,11 +59,7 @@ def get_profiles(input_dir):
 			this_directory = os.path.split(directory)[-1]
 			for file in files:
 				if file.split(".")[0] == this_directory: #Named similarly.
-					if len(call_stack) > 0:
-						parent = call_stack[-1]
-					else:
-						parent = None
-					directory_node = flatten(parse(os.path.join(directory, file)), parent)
+					directory_node = parse(os.path.join(directory, file))
 					break
 			else: #There was no common file for this directory.
 				directory_node = Profile(
@@ -76,13 +73,32 @@ def get_profiles(input_dir):
 			call_stack.append(directory_node)
 		else: #Leaf node. Find all the rest of the profiles.
 			for file in files:
+				profile = parse(os.path.join(directory, file))
 				if len(call_stack) > 0:
-					profile = flatten(parse(os.path.join(directory, file)), call_stack[-1])
 					call_stack[-1].subprofiles.append(profile)
 				else:
-					profile = flatten(parse(file), None)
 					call_stack.append(profile) #TODO: If the root directory is a leaf file, this only returns the first file.
 	return call_stack[0]
+
+def flatten_profiles(profile, parent=None):
+	"""
+	Flattens a profile, instantiating all settings that it inherits from its
+	parents.
+
+	After flattening it, it will proceed to flatten all its subprofiles.
+	:param profile: The profile to flatten.
+	:param parent: The parent of this profile. If not provided, a copy of the
+	input file is returned.
+	"""
+	logging.info("Flattening {file}.".format(file=profile.filepath))
+	if not parent:
+		return #Nothing to inherit.
+	for key, value in parent.settings.items():
+		if key not in profile.settings: #Only inherit settings that are not specified in the profile itself.
+			profile.settings[key] = value
+
+	for subprofile in profile.subprofiles:
+		flatten_profiles(subprofile, profile)
 
 def bubble_common_values(profile):
 	"""
@@ -158,25 +174,6 @@ def write_profiles(output_dir, profile):
 		write_profiles(output_dir, subprofile)
 
 #################################SUBROUTINES####################################
-
-def flatten(profile, parent=None):
-	"""
-	Flattens a profile, instantiating all settings that it inherits from its
-	parents.
-
-	The parent must already be flattened when calling this function.
-	:param profile: The profile to flatten.
-	:param parent: The parent of this profile. If not provided, a copy of the
-	input file is returned.
-	:return: A flattened profile.
-	"""
-	result = copy.copy(profile)
-	if not parent:
-		return result #Nothing to inherit.
-	for key, value in parent.settings.items():
-		if key not in result.settings: #Only inherit settings that are not specified in the profile itself.
-			result.settings[key] = value
-	return result
 
 def parse(file):
 	"""

@@ -61,7 +61,7 @@ def get_profiles(input_dir):
 						parent = call_stack[-1]
 					else:
 						parent = None
-					directory_node = flatten(parse(file), parent)
+					directory_node = flatten(parse(os.path.join(directory, file)), parent)
 					break
 			else: #There was no common file for this directory.
 				directory_node = Profile(
@@ -76,7 +76,7 @@ def get_profiles(input_dir):
 		else: #Leaf node. Find all the rest of the profiles.
 			for file in files:
 				if len(call_stack) > 0:
-					profile = flatten(parse(file), call_stack[-1])
+					profile = flatten(parse(os.path.join(directory, file)), call_stack[-1])
 					call_stack[-1].subprofiles.append(profile)
 				else:
 					profile = flatten(parse(file), None)

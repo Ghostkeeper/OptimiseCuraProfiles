@@ -19,7 +19,14 @@ import os #To get the current working directory as defaults for input and output
 
 #Global configuration stuff.
 logging.basicConfig(level=logging.DEBUG)
-Profile = collections.namedtuple("Profile", "filepath settings subprofiles baseconfig") #Filepath is a path string. Settings is a dictionary of settings. Subprofiles is a set of other Profile instances. Baseconfig is a configparser instance without the settings filled in.
+class Profile:
+	def __init__(self, filepath, settings, subprofiles, baseconfig, weight):
+		self.filepath = filepath #Path string.
+		self.settings = settings #Dictionary of settings.
+		self.subprofiles = subprofiles #Set of other Profile instances.
+		self.baseconfig = baseconfig #ConfigParser instance without all the settings filled in.
+		self.weight = weight #How much the profile counts in the decision which is the most common value.
+
 material_profiles = {"PLA", "ABS", "CPE", "Nylon", "PVA"} #Material profiles can only have material settings. TODO: Don't hard-code these, but get them based on XML input.
 material_settings = {
 	"material_print_temperature": "print temperature",
@@ -74,7 +81,8 @@ def get_profiles(input_dir):
 			filepath=os.path.join(input_dir, this_directory + ".inst.cfg"),
 			settings={},
 			subprofiles=[],
-			baseconfig=configparser.ConfigParser()
+			baseconfig=configparser.ConfigParser(),
+			weight=0
 		)
 
 	if directories: #Not a leaf node.
@@ -86,6 +94,7 @@ def get_profiles(input_dir):
 				continue
 			profile = parse(os.path.join(input_dir, file)) #Act as if every file is in its own subdirectory.
 			base_profile.subprofiles.append(profile)
+			base_profile.weight += profile.weight
 
 	return base_profile
 
@@ -155,8 +164,6 @@ def bubble_common_values(profile, except_root=False):
 					if value not in value_counts:
 						value_counts[value] = 0
 					value_counts[value] += 1
-				if key == "acceleration_enabled":
-					print(value_counts)
 		most_common_value = None
 		highest_count = -1
 		for value, count in value_counts.items():
@@ -250,7 +257,8 @@ def parse_cfg(file):
 		filepath=file,
 		settings={},
 		subprofiles=[],
-		baseconfig=configparser.ConfigParser()
+		baseconfig=configparser.ConfigParser(),
+		weight=1
 	)
 
 	data = configparser.ConfigParser() #Input file.
@@ -276,7 +284,8 @@ def parse_json(file):
 		filepath=file,
 		settings={},
 		subprofiles=[],
-		baseconfig=configparser.ConfigParser() #TODO: Make this base config a basic JSON file if we're going to be writing JSON as well.
+		baseconfig=configparser.ConfigParser(), #TODO: Make this base config a basic JSON file if we're going to be writing JSON as well.
+		weight=1
 	)
 	with open(file) as json_file:
 		data = json.load(json_file)

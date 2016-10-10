@@ -48,7 +48,7 @@ def get_profiles(input_dir):
 	:param input_dir: The root of the input directory structure.
 	:return: The root profile of the profile structure in the input directory.
 	"""
-	logging.info("Reading profiles.")
+	logging.info("Reading profiles in {directory}.".format(directory=input_dir))
 
 	files = [file for file in os.listdir(input_dir) if os.path.isfile(os.path.join(input_dir, file))]
 	directories = [directory for directory in os.listdir(input_dir) if os.path.isdir(os.path.join(input_dir, directory))]

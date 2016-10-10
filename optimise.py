@@ -171,6 +171,7 @@ def bubble_common_values(profile, except_root=False):
 		for value, count in value_counts.items():
 			if count > highest_count:
 				most_common_value = value
+				highest_count = count
 			elif count == highest_count: #We have a tie.
 				if value < most_common_value: #Just to make it deterministic.
 					most_common_value = value
@@ -338,8 +339,7 @@ def write_cfg(profile, output_dir):
 	"""
 	config = profile.baseconfig #Use the base config as starting point.
 	config.add_section("values")
-	sorted_keys = sorted(profile.settings)
-	for key in sorted_keys: #Serialise the settings to the config.
+	for key in sorted(profile.settings): #Serialise the settings to the config.
 		try:
 			config["values"][key] = profile.settings[key]
 		except Exception as e:

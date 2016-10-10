@@ -72,6 +72,8 @@ def get_profiles(input_dir):
 			base_profile.subprofiles.append(get_profiles(os.path.join(input_dir, directory)))
 	else: #Leaf node.
 		for file in files:
+			if file.split(".")[0] == this_directory: #This is the parent file.
+				continue
 			profile = parse(os.path.join(input_dir, file)) #Act as if every file is in its own subdirectory.
 			base_profile.subprofiles.append(profile)
 

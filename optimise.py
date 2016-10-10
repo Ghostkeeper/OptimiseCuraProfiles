@@ -154,6 +154,8 @@ def bubble_common_values(profile, except_root=False):
 					value_counts[value] = 0
 				value_counts[value] += 1
 		else: #Setting may not occur in a material profile. Skip all material profiles in the bubbling.
+			if is_material(profile): #We can't store the setting in this profile, so don't update the profile.
+				continue
 			for subprofile in profile.subprofiles:
 				if is_material(subprofile): #This is a material profile.
 					for subsubprofile in subprofile.subprofiles: #Look in all its grandchildren. TODO: Make it possible to have multiple material profiles in the chain.
@@ -177,7 +179,7 @@ def bubble_common_values(profile, except_root=False):
 					most_common_value = value
 		profile.settings[key] = most_common_value
 
-def remove_redundancies(profile, parent=None):
+def remove_redundancies(profile, parent=None, grandparent=None):
 	"""
 	Removes the settings in each profile that have the same value as its parent.
 
@@ -185,10 +187,12 @@ def remove_redundancies(profile, parent=None):
 	:param profile: The profile to remove redundancies from, containing all
 	profiles as subprofiles.
 	:param parent: The parent profile of the specified profile, if any.
+	:param grandparent: The grandparent profile of the specified profile, if
+	any.
 	"""
 	#First tail-recursively remove redundancies of all subprofiles.
 	for subprofile in profile.subprofiles:
-		remove_redundancies(subprofile, parent=profile)
+		remove_redundancies(subprofile, parent=profile, grandparent=parent)
 	logging.info("Removing redundancies of {file}.".format(file=profile.filepath))
 	#Edge case: Root file has no redundancies.
 	if not parent:
@@ -200,6 +204,10 @@ def remove_redundancies(profile, parent=None):
 		if key not in material_settings and is_material(profile):
 			redundancies.add(key)
 			continue
+		if key not in material_settings and is_material(parent) and grandparent: #This setting could not be stored in the material profile. Inherit from the grandparent instead.
+			if profile.settings[key] == grandparent.settings[key]:
+				redundancies.add(key)
+				continue
 		if profile.settings[key] == parent.settings[key]:
 			redundancies.add(key)
 			continue

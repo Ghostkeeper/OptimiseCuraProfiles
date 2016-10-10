@@ -152,9 +152,12 @@ def remove_redundancies(profile, parent=None):
 		return
 
 	#Remove settings that are the same as the parent.
+	redundancies = set()
 	for key in profile.settings:
 		if profile.settings[key] == parent.settings[key]:
-			del profile.settings[key]
+			redundancies.add(key)
+	for key in redundancies:
+		del profile.settings[key]
 
 def write_profiles(output_dir, profile):
 	"""

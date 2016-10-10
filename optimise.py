@@ -340,7 +340,10 @@ def write_cfg(profile, output_dir):
 	config = profile.baseconfig #Use the base config as starting point.
 	config.add_section("values")
 	for key in sorted(profile.settings): #Serialise the settings to the config.
-		config["values"][key] = profile.settings[key]
+		if key in material_settings and is_material(profile):
+			config["values"][material_settings[key]] = profile.settings[key]
+		else:
+			config["values"][key] = profile.settings[key]
 
 	if not os.path.exists(os.path.dirname(os.path.join(output_dir, profile.filepath))):
 		os.makedirs(os.path.dirname(os.path.join(output_dir, profile.filepath)))

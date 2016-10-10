@@ -142,18 +142,20 @@ def remove_redundancies(profile, parent=None):
 		if profile.settings[key] == parent.settings[key]:
 			del profile.settings[key]
 
-def write_profiles(output_dir, profile_root):
+def write_profiles(output_dir, profile):
 	"""
 	Writes a profile structure to file.
 
 	All profiles are written as the CFG file format. No other file format has
 	yet been implemented due to time constraints.
 	:param output_dir: The root directory to write the file structure to.
-	:param profile_root: The root profile, containing all profiles as
+	:param profile: The root profile, containing all profiles as
 	subprofiles.
 	"""
 	logging.info("Writing optimised profiles.")
-	raise Exception("Not implemented yet.")
+	write_cfg(profile)
+	for subprofile in profile.subprofiles:
+		write_profiles(output_dir, subprofile)
 
 #################################SUBROUTINES####################################
 
@@ -267,6 +269,21 @@ def parse_xml(file):
 	file.
 	"""
 	raise Exception("Not implemented yet.")
+
+def write_cfg(profile):
+	"""
+	Writes a CFG file from a profile.
+
+	The file is written to the filepath specified in the profile.
+	:param profile: The profile to write to a file.
+	"""
+	config = profile.baseconfig #Use the base config as starting point.
+	config.add_section("values")
+	for key, value in profile.settings.items(): #Serialise the settings to the config.
+		config["values"][key] = value
+
+	with open(profile.filepath) as config_file: #Write the config file itself.
+		config.write(config_file)
 
 if __name__ == "__main__":
 	argument_parser = argparse.ArgumentParser(description="Optimise a set of profiles for Cura.")

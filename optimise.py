@@ -289,8 +289,9 @@ def write_cfg(profile, output_dir):
 	"""
 	config = profile.baseconfig #Use the base config as starting point.
 	config.add_section("values")
-	for key, value in profile.settings.items(): #Serialise the settings to the config.
-		config["values"][key] = value
+	sorted_keys = sorted(profile.settings)
+	for key in sorted_keys: #Serialise the settings to the config.
+		config["values"][key] = profile.settings[key]
 
 	if not os.path.exists(os.path.dirname(os.path.join(output_dir, profile.filepath))):
 		os.makedirs(os.path.dirname(os.path.join(output_dir, profile.filepath)))

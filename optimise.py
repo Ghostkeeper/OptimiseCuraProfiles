@@ -153,7 +153,7 @@ def write_profiles(output_dir, profile):
 	subprofiles.
 	"""
 	logging.info("Writing optimised profiles.")
-	write_cfg(profile)
+	write_cfg(profile, output_dir)
 	for subprofile in profile.subprofiles:
 		write_profiles(output_dir, subprofile)
 
@@ -270,19 +270,21 @@ def parse_xml(file):
 	"""
 	raise Exception("Not implemented yet.")
 
-def write_cfg(profile):
+def write_cfg(profile, output_dir):
 	"""
 	Writes a CFG file from a profile.
 
 	The file is written to the filepath specified in the profile.
 	:param profile: The profile to write to a file.
+	:param output_dir: The root of the output directory to write the profiles
+	to.
 	"""
 	config = profile.baseconfig #Use the base config as starting point.
 	config.add_section("values")
 	for key, value in profile.settings.items(): #Serialise the settings to the config.
 		config["values"][key] = value
 
-	with open(profile.filepath, "w") as config_file: #Write the config file itself.
+	with open(os.path.join(output_dir, profile.filepath), "w") as config_file: #Write the config file itself.
 		config.write(config_file)
 
 if __name__ == "__main__":

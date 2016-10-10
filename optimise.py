@@ -54,7 +54,7 @@ def get_profiles(input_dir):
 		while(len(call_stack)) > depth:
 			call_stack.pop()
 		if subdirectories: #Not a leaf node. Look for a file that is named like the folder.
-			this_directory = os.path.dirname(directory)
+			this_directory = os.path.split(directory)[-1]
 			for file in files:
 				if file.split(".")[0] == this_directory: #Named similarly.
 					if len(call_stack) > 0:

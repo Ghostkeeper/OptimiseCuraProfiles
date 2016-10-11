@@ -37,6 +37,14 @@ material_settings = {
 	"retraction_amount": "retraction amount",
 	"retraction_speed": "retraction speed"
 }
+per_extruder_warning_settings = {"support_enable",
+                                 "adhesion_extruder_nr", "support_extruder_nr", "support_infill_extruder_nr", "support_interface_extruder_nr", "support_extruder_nr_layer_0",
+                                 "prime_tower_position_x", "prime_tower_position_y",
+                                 "print_sequence",
+                                 "draft_shield_enabled",
+                                 "wireframe_enabled", #TODO: Wireframe
+                                 #TODO: Machine settings.
+                                }
 
 def optimise(input_dir, output_dir):
 	"""
@@ -346,6 +354,12 @@ def write_cfg(profile, output_dir):
 	to.
 	"""
 	config = profile.baseconfig #Use the base config as starting point.
+
+	if config.has_section("metadata") and config["metadata"]["type"] == "quality":
+		warning_settings = per_extruder_warning_settings & profile.settings
+		if warning_settings:
+			logging.warning("These settings may give problems in the profile {profile}: {settings}".format(profile=profile.filepath, settings=warning_settings))
+
 	config.add_section("values")
 	for key in sorted(profile.settings): #Serialise the settings to the config.
 		if key in material_settings and is_material(profile):

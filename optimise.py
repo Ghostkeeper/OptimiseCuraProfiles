@@ -356,7 +356,7 @@ def write_cfg(profile, output_dir):
 	config = profile.baseconfig #Use the base config as starting point.
 
 	if config.has_section("metadata") and config["metadata"]["type"] == "quality":
-		warning_settings = per_extruder_warning_settings & profile.settings
+		warning_settings = per_extruder_warning_settings & profile.settings.keys()
 		if warning_settings:
 			logging.warning("These settings may give problems in the profile {profile}: {settings}".format(profile=profile.filepath, settings=warning_settings))
 

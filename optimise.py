@@ -209,14 +209,13 @@ def remove_redundancies(profile, parent=None, grandparent=None):
 	#Remove settings that are the same as the parent.
 	redundancies = set()
 	for key in profile.settings:
+		temp_parent = parent
+		if key not in material_settings and is_material(parent) and grandparent:
+			temp_parent = grandparent
 		if key not in material_settings and is_material(profile):
 			redundancies.add(key)
 			continue
-		if key not in material_settings and is_material(parent) and grandparent: #This setting could not be stored in the material profile. Inherit from the grandparent instead.
-			if profile.settings[key] == grandparent.settings[key]:
-				redundancies.add(key)
-				continue
-		if profile.settings[key] == parent.settings[key]:
+		if profile.settings[key] == temp_parent.settings[key]:
 			redundancies.add(key)
 			continue
 	for key in redundancies:

@@ -176,6 +176,8 @@ def bubble_common_values(profile, except_root=False):
 					if value not in value_counts:
 						value_counts[value] = 0
 					value_counts[value] += 1
+		if key == "switch_extruder_retraction_amount":
+			print(value_counts)
 		most_common_value = None
 		highest_count = -1
 		for value, count in value_counts.items():
@@ -326,10 +328,11 @@ def parse_json_setting(setting_dict):
 	subsettings.
 	"""
 	for key, subdict in setting_dict.items():
-		if "default_value" in subdict:
-			yield key, "=" + str(subdict["default_value"])
-		elif "value" in subdict: #default_value overrides value.
-			yield key, str(subdict["value"])
+		if "value" in subdict:
+			yield key, "=" + str(subdict["value"])
+		elif "default_value" in subdict: #default_value overrides value.
+			yield key, str(subdict["default_value"])
+
 		if "children" in subdict: #Recursively yield from child settings.
 			yield from parse_json_setting(subdict["children"])
 

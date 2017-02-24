@@ -27,7 +27,7 @@ class Profile:
 		self.baseconfig = baseconfig #ConfigParser instance without all the settings filled in.
 		self.weight = weight #How much the profile counts in the decision which is the most common value.
 
-material_profiles = {"PLA", "ABS", "CPE", "Nylon", "PVA"} #Material profiles can only have material settings. TODO: Don't hard-code these, but get them based on XML input.
+material_profiles = {"PLA", "ABS", "CPE", "Nylon", "PVA", "CPEP", "PC", "TPU"} #Material profiles can only have material settings. TODO: Don't hard-code these, but get them based on XML input.
 material_settings = {
 	"material_print_temperature": "print temperature",
 	"material_bed_temperature": "heated bed temperature",

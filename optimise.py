@@ -29,7 +29,7 @@ class Profile:
 
 material_profiles = {"PLA", "ABS", "CPE", "Nylon", "PVA", "CPEP", "PC", "TPU"} #Material profiles can only have material settings. TODO: Don't hard-code these, but get them based on XML input.
 material_settings = {
-	"material_print_temperature": "print temperature",
+	"default_material_print_temperature": "print temperature",
 	"material_bed_temperature": "heated bed temperature",
 	"material_standby_temperature": "standby temperature",
 	"material_flow_temp_graph": "processing temperature graph",

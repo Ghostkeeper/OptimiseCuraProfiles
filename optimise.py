@@ -382,7 +382,7 @@ if __name__ == "__main__":
 	if arguments.input_dir == arguments.output_dir:
 		raise Exception("Input and output directories may not be the same (both were \"{dir}\").".format(dir=arguments.input_dir))
 	if arguments.nobubble:
-		do_bubbling = True
-	else:
 		do_bubbling = False
+	else:
+		do_bubbling = True
 	optimise(arguments.input_dir, arguments.output_dir)

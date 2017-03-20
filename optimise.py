@@ -38,7 +38,7 @@ material_settings = {
 	"retraction_speed": "retraction speed"
 }
 per_extruder_warning_settings = {"support_enable",
-                                 "adhesion_extruder_nr", "support_extruder_nr", "support_infill_extruder_nr", "support_interface_extruder_nr", "support_extruder_nr_layer_0",
+                                 "adhesion_extruder_nr", "support_extruder_nr", "support_infill_extruder_nr", "support_roof_extruder_nr", "support_bottom_extruder_nr", "support_extruder_nr_layer_0",
                                  "prime_tower_position_x", "prime_tower_position_y",
                                  "print_sequence",
                                  "draft_shield_enabled",

@@ -58,8 +58,7 @@ def optimise(input_dir, output_dir):
 	"""
 	profile_root = get_profiles(input_dir)
 	flatten_profiles(profile_root)
-	if do_bubbling:
-		bubble_common_values(profile_root, except_root=True)
+	bubble_common_values(profile_root, bubble_from_depth)
 	remove_redundancies(profile_root)
 	write_profiles(output_dir, profile_root)
 
@@ -128,7 +127,7 @@ def flatten_profiles(profile, parent=None):
 	for subprofile in profile.subprofiles:
 		flatten_profiles(subprofile, profile)
 
-def bubble_common_values(profile, except_root=False):
+def bubble_common_values(profile, bubble_from_depth):
 	"""
 	Finds the common denominator of the profiles in each subgroup, and bubbles
 	them up.
@@ -140,13 +139,15 @@ def bubble_common_values(profile, except_root=False):
 	The provided root profile is modified to this end.
 	:param profile: The root profile, containing all profiles as
 	subprofiles.
+	:param bubble_from_depth: How many layers of profiles below this one should
+	not get bubbled.
 	:param except_root: Whether we should prevent making changes to the root of
 	the profile tree.
 	"""
 	#First tail-recursively bubble all subprofiles.
 	for subprofile in profile.subprofiles:
-		bubble_common_values(subprofile)
-	if except_root: #We've already done our children, but we want to exempt the root of the tree, which is this node.
+		bubble_common_values(subprofile, bubble_from_depth - 1)
+	if bubble_from_depth > 0: #We want to exempt this level from bubbling.
 		return
 	logging.info("Finding common denominators of {file}.".format(file=profile.filepath))
 	#Edge case: No subprofiles.
@@ -377,12 +378,9 @@ if __name__ == "__main__":
 	argument_parser = argparse.ArgumentParser(description="Optimise a set of profiles for Cura.")
 	argument_parser.add_argument("-i", dest="input_dir", help="Root directory of input profile structure.", default=os.getcwd())
 	argument_parser.add_argument("-o", dest="output_dir", help="Root directory of output profile structure.", default=os.getcwd())
-	argument_parser.add_argument("--nobubble", help="Don't bubble common setting values to higher-order profiles, only remove redundancies.")
+	argument_parser.add_argument("-b", dest="bubble_from_depth", help="How many levels of profiles to retain. These levels will remain unmodified by bubbling. Set to 0 to bubble settings all the way up to fdmprinter, or 1 to exclude just fdmprinter. Set it very high to prevent bubbling at all.", default="1")
 	arguments = argument_parser.parse_args()
 	if arguments.input_dir == arguments.output_dir:
 		raise Exception("Input and output directories may not be the same (both were \"{dir}\").".format(dir=arguments.input_dir))
-	if arguments.nobubble:
-		do_bubbling = False
-	else:
-		do_bubbling = True
+	bubble_from_depth = int(arguments.bubble_from_depth)
 	optimise(arguments.input_dir, arguments.output_dir)

@@ -260,7 +260,7 @@ def parse(file):
 		return parse_cfg(file)
 	if extension == ".json":
 		return parse_json(file)
-	if extension == ".xml":
+	if extension == ".fdm_material":
 		return parse_xml(file)
 	raise Exception("Unknown file extension \"{extension}\".".format(extension=extension))
 

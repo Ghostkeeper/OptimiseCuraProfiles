@@ -11,7 +11,6 @@ For usage instructions, run the script with the "--help" parameter.
 """
 
 import argparse #To parse the input and output directories.
-import collections #For namedtuple.
 import configparser #To parse and write .cfg files.
 import json #To parse .json files.
 import logging
@@ -122,6 +121,8 @@ def flatten_profiles(profile, parent=None):
 	if parent:
 		for key, value in parent.settings.items():
 			if key not in profile.settings: #Only inherit settings that are not specified in the profile itself.
+				if key == track_setting:
+					logging.debug("Flattening adds {key}.".format(key=key))
 				profile.settings[key] = value
 
 	for subprofile in profile.subprofiles:
@@ -187,6 +188,8 @@ def bubble_common_values(profile, bubble_from_depth):
 			elif count == highest_count: #We have a tie.
 				if value < most_common_value: #Just to make it deterministic.
 					most_common_value = value
+		if profile.settings[key] != most_common_value and key == track_setting:
+			logging.debug("Bubbling set {key} to {value}.".format(key=key, value=most_common_value))
 		profile.settings[key] = most_common_value
 
 def remove_redundancies(profile, parent=None, grandparent=None):
@@ -222,6 +225,8 @@ def remove_redundancies(profile, parent=None, grandparent=None):
 			continue
 	for key in redundancies:
 		del profile.settings[key]
+		if key == track_setting:
+			logging.debug("Removed redundant {key}".format(key=key))
 
 def write_profiles(output_dir, profile):
 	"""
@@ -379,8 +384,10 @@ if __name__ == "__main__":
 	argument_parser.add_argument("-i", dest="input_dir", help="Root directory of input profile structure.", default=os.getcwd())
 	argument_parser.add_argument("-o", dest="output_dir", help="Root directory of output profile structure.", default=os.getcwd())
 	argument_parser.add_argument("-b", dest="bubble_from_depth", help="How many levels of profiles to retain. These levels will remain unmodified by bubbling. Set to 0 to bubble settings all the way up to fdmprinter, or 1 to exclude just fdmprinter. Set it very high to prevent bubbling at all.", default="1")
+	argument_parser.add_argument("--track", dest="track_setting", help="To debug. Logs messages whenever the specified setting key is touched.", default="")
 	arguments = argument_parser.parse_args()
 	if arguments.input_dir == arguments.output_dir:
 		raise Exception("Input and output directories may not be the same (both were \"{dir}\").".format(dir=arguments.input_dir))
 	bubble_from_depth = int(arguments.bubble_from_depth)
+	track_setting = arguments.track_setting
 	optimise(arguments.input_dir, arguments.output_dir)

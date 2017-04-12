@@ -218,15 +218,17 @@ def remove_redundancies(profile, parent=None, grandparent=None):
 		if key not in material_settings and is_material(parent) and grandparent:
 			temp_parent = grandparent
 		if key not in material_settings and is_material(profile):
+			if key == track_setting:
+				logging.debug("Removed redundant {key} (non-material setting).".format(key=key))
 			redundancies.add(key)
 			continue
 		if profile.settings[key] == temp_parent.settings[key]:
+			if key == track_setting:
+				logging.debug("Removed redundant {key} (same as parent: {value} vs {parent_value})".format(key=key, value=profile.settings[key], parent_value=temp_parent.settings[key]))
 			redundancies.add(key)
 			continue
 	for key in redundancies:
 		del profile.settings[key]
-		if key == track_setting:
-			logging.debug("Removed redundant {key}".format(key=key))
 
 def write_profiles(output_dir, profile):
 	"""

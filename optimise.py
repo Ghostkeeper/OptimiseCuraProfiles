@@ -296,6 +296,8 @@ def parse_cfg(file):
 		result.baseconfig["metadata"] = data["metadata"]
 	if data.has_section("values"): #Put the settings in the settings dict for further processing later.
 		for key, value in data["values"].items():
+			if key == track_setting:
+				logging.debug("Loading {key} from {file}: {value}.".format(key=key, value=value, file=file))
 			result.settings[key] = value
 	return result
 
@@ -319,9 +321,13 @@ def parse_json(file):
 
 	if "settings" in data:
 		for key, value in parse_json_setting(data["settings"]):
+			if key == track_setting:
+				logging.debug("Loading {key} from {file}: {value}.".format(key=key, value=value, file=file))
 			result.settings[key] = value
 	if "overrides" in data:
 		for key, value in parse_json_setting(data["overrides"]):
+			if key == track_setting:
+				logging.debug("Loading {key} from {file}: {value}.".format(key=key, value=value, file=file))
 			result.settings[key] = value
 
 	return result

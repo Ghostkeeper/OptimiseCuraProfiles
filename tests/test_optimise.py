@@ -43,3 +43,16 @@ class TestOptimise(unittest.TestCase):
 		assert len(profile.subprofiles[0].subprofiles) == 2
 		assert profile.subprofiles[0].subprofiles[0].filepath == os.path.join(self.data_directory, "subdirectory", "leaf1.inst.cfg")
 		assert profile.subprofiles[0].subprofiles[1].filepath == os.path.join(self.data_directory, "subdirectory", "leaf2.inst.cfg") #Should also be sorted!
+
+	def test_get_profiles_weight(self):
+		"""
+		Tests whether loaded profiles get assigned the correct weights.
+
+		The weight of a profile should indicate the number of profiles it
+		encompasses.
+		"""
+		profile = optimise.get_profiles(self.data_directory)
+		assert profile.weight == 4 #test_data, subdirectory, leaf1 and leaf2.
+		assert profile.subprofiles[0].weight == 3 #subdirectory, leaf1 and leaf2.
+		assert profile.subprofiles[0].subprofiles[0].weight == 1 #Just leaf1.
+		assert profile.subprofiles[0].subprofiles[1].weight == 1 #Just leaf2.

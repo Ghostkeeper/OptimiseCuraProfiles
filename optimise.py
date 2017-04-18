@@ -17,6 +17,8 @@ import logging
 import os #To get the current working directory as defaults for input and output, and for file path operations.
 
 #Global configuration stuff.
+bubble_from_depth = 0
+track_setting = ""
 logging.basicConfig(level=logging.DEBUG)
 class Profile:
 	def __init__(self, filepath, settings, subprofiles, baseconfig, weight):

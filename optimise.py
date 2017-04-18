@@ -98,7 +98,9 @@ def get_profiles(input_dir):
 
 	if directories: #Not a leaf node.
 		for directory in directories:
-			base_profile.subprofiles.append(get_profiles(os.path.join(input_dir, directory)))
+			subprofile = get_profiles(os.path.join(input_dir, directory))
+			base_profile.subprofiles.append(subprofile)
+			base_profile.weight += subprofile.weight
 	else: #Leaf node.
 		for file in files:
 			if file.split(".")[0] == this_directory: #This is the parent file.

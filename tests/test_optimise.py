@@ -18,4 +18,4 @@ class TestOptimise(unittest.TestCase):
 		"""
 		Tests whether the profiles are read correctly.
 		"""
-		assert True
+		profile = optimise.get_profiles(os.path.join(os.path.abspath(os.path.dirname(__file__)), "test_data"))

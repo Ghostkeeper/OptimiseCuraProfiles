@@ -1,6 +1,10 @@
 #IDEs
 .idea
+__pycache__
 
 #Testing directories
 input
 output
+
+#Building and compiled stuff
+build

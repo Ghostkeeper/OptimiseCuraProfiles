@@ -14,9 +14,32 @@ class TestOptimise(unittest.TestCase):
 	Tests the components of the optimise script.
 	"""
 
+	data_directory = os.path.join(os.path.abspath(os.path.dirname(__file__)), "test_data")
+	"""
+	A data directory to load test files from.
+	"""
+
 	def test_get_profiles_filepath(self):
 		"""
 		Tests whether the file path is stored correctly in the profiles.
 		"""
-		profile = optimise.get_profiles(os.path.join(os.path.abspath(os.path.dirname(__file__)), "test_data"))
-		assert profile.filepath == os.path.join(os.path.abspath(os.path.dirname(__file__)), "test_data", "test_data.inst.cfg")
+		profile = optimise.get_profiles(self.data_directory)
+		assert profile.filepath == os.path.join(self.data_directory, "test_data.inst.cfg")
+
+	def test_get_profiles_children(self):
+		"""
+		Tests whether the children are properly found when loading profiles.
+		"""
+		profile = optimise.get_profiles(self.data_directory)
+		assert len(profile.subprofiles) == 1 #One child called 'subdirectory'.
+		assert profile.subprofiles[0].filepath == os.path.join(self.data_directory, "subdirectory", "subdirectory.inst.cfg")
+
+	def test_get_profiles_grandchildren(self):
+		"""
+		Tests whether the grandchildren are properly found when loading
+		profiles.
+		"""
+		profile = optimise.get_profiles(self.data_directory)
+		assert len(profile.subprofiles[0].subprofiles) == 2
+		assert profile.subprofiles[0].subprofiles[0].filepath == os.path.join(self.data_directory, "subdirectory", "leaf1.inst.cfg")
+		assert profile.subprofiles[0].subprofiles[1].filepath == os.path.join(self.data_directory, "subdirectory", "leaf2.inst.cfg") #Should also be sorted!

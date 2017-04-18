@@ -14,8 +14,9 @@ class TestOptimise(unittest.TestCase):
 	Tests the components of the optimise script.
 	"""
 
-	def test_get_profiles(self):
+	def test_get_profiles_filepath(self):
 		"""
-		Tests whether the profiles are read correctly.
+		Tests whether the file path is stored correctly in the profiles.
 		"""
 		profile = optimise.get_profiles(os.path.join(os.path.abspath(os.path.dirname(__file__)), "test_data"))
+		assert profile.filepath == os.path.join(os.path.abspath(os.path.dirname(__file__)), "test_data", "test_data.inst.cfg")

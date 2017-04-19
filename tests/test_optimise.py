@@ -5,6 +5,7 @@
 #The license can also be read online: <https://creativecommons.org/publicdomain/zero/1.0/>. If this online license differs from the license provided with this software, the license provided with this software should be applied.
 
 import os.path #To get a directory with test files.
+import tempfile #To create a temporary empty directory. You can't have empty directory in Git.
 import unittest #The testing suite.
 
 import optimise #The module we're testing.
@@ -73,3 +74,11 @@ class TestOptimise(unittest.TestCase):
 		assert profile.subprofiles[0].settings["apples"] == "4"
 		assert profile.subprofiles[0].subprofiles[0].settings["apples"] == "5"
 		assert profile.subprofiles[0].subprofiles[1].settings["apples"] == "6"
+
+	def test_get_profiles_empty_directory(self):
+		"""
+		Tests getting profiles from a directory that is empty.
+		"""
+		temporary_directory = tempfile.TemporaryDirectory()
+		with self.assertRaises(FileNotFoundError):
+			optimise.get_profiles(temporary_directory.name) #Because it's an empty directory.

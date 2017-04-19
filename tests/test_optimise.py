@@ -56,3 +56,15 @@ class TestOptimise(unittest.TestCase):
 		assert profile.subprofiles[0].weight == 3 #subdirectory, leaf1 and leaf2.
 		assert profile.subprofiles[0].subprofiles[0].weight == 1 #Just leaf1.
 		assert profile.subprofiles[0].subprofiles[1].weight == 1 #Just leaf2.
+
+	def test_get_profiles_settings(self):
+		"""
+		Tests whether loaded profiles have the correct settings.
+		"""
+		profile = optimise.get_profiles(self.data_directory)
+		assert profile.settings["apples"] == "3"
+		assert profile.settings["oranges"] == "5"
+		assert profile.settings["bananas"] == "-1"
+		assert profile.subprofiles[0].settings["apples"] == "4"
+		assert profile.subprofiles[0].subprofiles[0].settings["apples"] == "5"
+		assert profile.subprofiles[0].subprofiles[1].settings["apples"] == "6"

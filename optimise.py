@@ -81,6 +81,9 @@ def get_profiles(input_dir):
 	directories = [directory for directory in os.listdir(input_dir) if os.path.isdir(os.path.join(input_dir, directory))]
 	directories.sort()
 
+	if not files and not directories:
+		raise FileNotFoundError("Input directory is empty. This is probably not what you intended.")
+
 	#Find the base file.
 	this_directory = os.path.split(input_dir)[-1]
 	for file in files:

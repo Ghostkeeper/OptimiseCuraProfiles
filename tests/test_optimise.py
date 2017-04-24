@@ -9,8 +9,9 @@ import tempfile #To create a temporary empty directory. You can't have empty dir
 import unittest #The testing suite.
 
 import optimise #The module we're testing.
+import tests.test_meta #To allow parametrised tests.
 
-class TestOptimise(unittest.TestCase):
+class TestOptimise(unittest.TestCase, metaclass=tests.test_meta.TestMeta):
 	"""
 	Tests the components of the optimise script.
 	"""

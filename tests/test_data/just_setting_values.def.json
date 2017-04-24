@@ -1,0 +1,8 @@
+{
+	"settings":
+	{
+		"foo": {"value": "3"},
+		"bar": {"value": "'bar'"},
+		"is_giraffe": {"value": "True"}
+	}
+}

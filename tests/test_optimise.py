@@ -9,9 +9,9 @@ import tempfile #To create a temporary empty directory. You can't have empty dir
 import unittest #The testing suite.
 
 import optimise #The module we're testing.
-import tests.test_meta #To allow parametrised tests.
+import tests.tests #To allow parametrised tests.
 
-class TestOptimise(unittest.TestCase, metaclass=tests.test_meta.TestMeta):
+class TestOptimise(unittest.TestCase, metaclass=tests.tests.TestMeta):
 	"""
 	Tests the components of the optimise script.
 	"""
@@ -83,3 +83,25 @@ class TestOptimise(unittest.TestCase, metaclass=tests.test_meta.TestMeta):
 		temporary_directory = tempfile.TemporaryDirectory()
 		with self.assertRaises(FileNotFoundError):
 			optimise.get_profiles(temporary_directory.name) #Because it's an empty directory.
+
+	@tests.tests.parametrise({
+		"empty": {"json_file": "empty.def.json", "settings": {}},
+		"just_setting_values": {"json_file": "just_setting_values.def.json", "settings": {"foo": "=3", "bar": "='bar'", "is_giraffe": "=True"}}, #Should add = before each value.
+		"just_setting_defaults": {"json_file": "just_setting_defaults.def.json", "settings": {"foo": "3", "bar": "bar", "is_giraffe": "True"}},
+		"just_overrides": {"json_file": "just_overrides.def.json", "settings": {"bla": "=8", "sla": "3.14"}},
+		"settings_and_overrides": {"json_file": "settings_and_overrides.def.json", "settings": {"foo": "=3", "bar": "=1"}},
+		"colliding_settings_overrides": {"json_file": "colliding_settings_overrides.def.json", "settings": {"foo": "=1"}}, #Overrides wins.
+		"children": {"json_file": "children.def.json", "settings": {"grandparent": "=102", "parent": "=75", "child": "=39", "grandchild": "=12"}}, #All flattened.
+		"weird_names": {"json_file": "weird_names.def.json", "settings": {"value": "3", "default_value": "4", "": "5", " ": "6", "hè?": "7"}}
+	})
+	def test_parse_json(self, json_file, settings):
+		"""
+		Tests whether JSON files are correctly parsed.
+		:param json_file: The file to test parsing, relative to the test data
+		directory.
+		:param settings: A dictionary that specifies for each key that
+		should be found what value should be found.
+		"""
+		json_file = os.path.join(self.data_directory, json_file)
+		profile = optimise.parse_json(json_file)
+		self.assertDictEqual(profile.settings, settings)

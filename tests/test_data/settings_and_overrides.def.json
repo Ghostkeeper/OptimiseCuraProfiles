@@ -1,0 +1,10 @@
+{
+	"settings":
+	{
+		"foo": {"value": "3"}
+	},
+	"overrides":
+	{
+		"bar": {"value": "1"}
+	}
+}

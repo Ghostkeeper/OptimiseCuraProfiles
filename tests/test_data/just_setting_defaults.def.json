@@ -1,0 +1,8 @@
+{
+	"settings":
+	{
+		"foo": {"default_value": 3},
+		"bar": {"default_value": "bar"},
+		"is_giraffe": {"default_value": true}
+	}
+}

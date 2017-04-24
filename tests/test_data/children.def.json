@@ -1,0 +1,27 @@
+{
+	"settings":
+	{
+		"grandparent":
+		{
+			"value": "102",
+			"children":
+			{
+				"parent":
+				{
+					"value": "75",
+					"children":
+					{
+						"child":
+						{
+							"value": "39",
+							"children":
+							{
+								"grandchild": {"value": "12"}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}

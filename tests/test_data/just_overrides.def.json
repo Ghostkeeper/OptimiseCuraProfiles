@@ -1,0 +1,7 @@
+{
+	"overrides":
+	{
+		"bla": {"value": "8"},
+		"sla": {"default_value": 3.14}
+	}
+}

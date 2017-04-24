@@ -85,14 +85,38 @@ class TestOptimise(unittest.TestCase, metaclass=tests.tests.TestMeta):
 			optimise.get_profiles(temporary_directory.name) #Because it's an empty directory.
 
 	@tests.tests.parametrise({
-		"empty": {"json_file": "empty.def.json", "settings": {}},
-		"just_setting_values": {"json_file": "just_setting_values.def.json", "settings": {"foo": "=3", "bar": "='bar'", "is_giraffe": "=True"}}, #Should add = before each value.
-		"just_setting_defaults": {"json_file": "just_setting_defaults.def.json", "settings": {"foo": "3", "bar": "bar", "is_giraffe": "True"}},
-		"just_overrides": {"json_file": "just_overrides.def.json", "settings": {"bla": "=8", "sla": "3.14"}},
-		"settings_and_overrides": {"json_file": "settings_and_overrides.def.json", "settings": {"foo": "=3", "bar": "=1"}},
-		"colliding_settings_overrides": {"json_file": "colliding_settings_overrides.def.json", "settings": {"foo": "=1"}}, #Overrides wins.
-		"children": {"json_file": "children.def.json", "settings": {"grandparent": "=102", "parent": "=75", "child": "=39", "grandchild": "=12"}}, #All flattened.
-		"weird_names": {"json_file": "weird_names.def.json", "settings": {"value": "3", "default_value": "4", "": "5", " ": "6", "hè?": "7"}}
+		"empty": {
+			"json_file": "empty.def.json",
+			"settings": {}
+		},
+		"just_setting_values": {
+			"json_file": "just_setting_values.def.json",
+			"settings": {"foo": "=3", "bar": "='bar'", "is_giraffe": "=True"} #Should add = before each value.
+		},
+		"just_setting_defaults": {
+			"json_file": "just_setting_defaults.def.json",
+			"settings": {"foo": "3", "bar": "bar", "is_giraffe": "True"}
+		},
+		"just_overrides": {
+			"json_file": "just_overrides.def.json",
+			"settings": {"bla": "=8", "sla": "3.14"}
+		},
+		"settings_and_overrides": {
+			"json_file": "settings_and_overrides.def.json",
+			"settings": {"foo": "=3", "bar": "=1"}
+		},
+		"colliding_settings_overrides": {
+			"json_file": "colliding_settings_overrides.def.json",
+			"settings": {"foo": "=1"} #Overrides wins.
+		},
+		"children": {
+			"json_file": "children.def.json",
+			"settings": {"grandparent": "=102", "parent": "=75", "child": "=39", "grandchild": "=12"} #All flattened.
+		},
+		"weird_names": {
+			"json_file": "weird_names.def.json",
+			"settings": {"value": "3", "default_value": "4", "": "5", " ": "6", "hè?": "7"}
+		}
 	})
 	def test_parse_json(self, json_file, settings):
 		"""

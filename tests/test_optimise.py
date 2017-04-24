@@ -123,9 +123,35 @@ class TestOptimise(unittest.TestCase, metaclass=tests.tests.TestMeta):
 		Tests whether JSON files are correctly parsed.
 		:param json_file: The file to test parsing, relative to the test data
 		directory.
-		:param settings: A dictionary that specifies for each key that
-		should be found what value should be found.
+		:param settings: A dictionary that specifies for each key that should be
+		found what value should be found.
 		"""
 		json_file = os.path.join(self.data_directory, json_file)
 		profile = optimise.parse_json(json_file)
+		self.assertDictEqual(profile.settings, settings)
+
+	@tests.tests.parametrise({
+		"empty": {
+			"cfg_file": "empty.inst.cfg",
+			"settings": {} #Should not give an error that the 'values' section could not be found!
+		},
+		"simple": {
+			"cfg_file": "simple.inst.cfg",
+			"settings": {"foo": "bar"}
+		},
+		"multiple": {
+			"cfg_file": "multiple.inst.cfg",
+			"settings": {"foo": "3", "bar": "4"}
+		}
+	})
+	def test_parse_cfg(self, cfg_file, settings):
+		"""
+		Tests whether CFG files are correctly parsed.
+		:param cfg_file: The file to test parsing, relative to the test data
+		directory.
+		:param settings: A dictionary that specifies for each key that should be
+		found what value should be found.
+		"""
+		cfg_file = os.path.join(self.data_directory, cfg_file)
+		profile = optimise.parse_cfg(cfg_file)
 		self.assertDictEqual(profile.settings, settings)

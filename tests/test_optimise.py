@@ -26,7 +26,7 @@ class TestOptimise(unittest.TestCase):
 		"""
 		input_directory = os.path.join(self.data_directory, "simple_tree")
 		profile = optimise.get_profiles(input_directory)
-		assert profile.filepath == os.path.join(input_directory, "simple_tree.inst.cfg")
+		self.assertEqual(profile.filepath, os.path.join(input_directory, "simple_tree.inst.cfg"), "The file is in simple_tree/simple_tree.inst.cfg.")
 
 	def test_get_profiles_children(self):
 		"""
@@ -34,8 +34,8 @@ class TestOptimise(unittest.TestCase):
 		"""
 		input_directory = os.path.join(self.data_directory, "simple_tree")
 		profile = optimise.get_profiles(input_directory)
-		assert len(profile.subprofiles) == 1 #One child called 'subdirectory'.
-		assert profile.subprofiles[0].filepath == os.path.join(input_directory, "subdirectory", "subdirectory.inst.cfg")
+		self.assertEqual(len(profile.subprofiles), 1, "There is only one child, 'subdirectory'.")
+		self.assertEqual(profile.subprofiles[0].filepath, os.path.join(input_directory, "subdirectory", "subdirectory.inst.cfg"), "The child is in the test_data/subdirectory/subdirectory.inst.cfg file.")
 
 	def test_get_profiles_grandchildren(self):
 		"""
@@ -44,9 +44,9 @@ class TestOptimise(unittest.TestCase):
 		"""
 		input_directory = os.path.join(self.data_directory, "simple_tree")
 		profile = optimise.get_profiles(input_directory)
-		assert len(profile.subprofiles[0].subprofiles) == 2
-		assert profile.subprofiles[0].subprofiles[0].filepath == os.path.join(input_directory, "subdirectory", "leaf1.inst.cfg")
-		assert profile.subprofiles[0].subprofiles[1].filepath == os.path.join(input_directory, "subdirectory", "leaf2.inst.cfg") #Should also be sorted!
+		self.assertEqual(len(profile.subprofiles[0].subprofiles), 2, "There are two grandchildren under the 'subdirectory' directory.")
+		self.assertEqual(profile.subprofiles[0].subprofiles[0].filepath, os.path.join(input_directory, "subdirectory", "leaf1.inst.cfg"), "The first grandchild is leaf1. It must be sorted.")
+		self.assertEqual(profile.subprofiles[0].subprofiles[1].filepath, os.path.join(input_directory, "subdirectory", "leaf2.inst.cfg"), "The second grandchild is leaf2. It must be sorted.")
 
 	def test_get_profiles_weight(self):
 		"""
@@ -57,10 +57,10 @@ class TestOptimise(unittest.TestCase):
 		"""
 		input_directory = os.path.join(self.data_directory, "simple_tree")
 		profile = optimise.get_profiles(input_directory)
-		assert profile.weight == 4 #test_data, subdirectory, leaf1 and leaf2.
-		assert profile.subprofiles[0].weight == 3 #subdirectory, leaf1 and leaf2.
-		assert profile.subprofiles[0].subprofiles[0].weight == 1 #Just leaf1.
-		assert profile.subprofiles[0].subprofiles[1].weight == 1 #Just leaf2.
+		self.assertEqual(profile.weight, 4, "There is the root test data, the subdirectory, leaf1 and leaf2.")
+		self.assertEqual(profile.subprofiles[0].weight, 3, "There is the subdirectory, leaf1 and leaf2.")
+		self.assertEqual(profile.subprofiles[0].subprofiles[0].weight, 1, "Just leaf1.")
+		self.assertEqual(profile.subprofiles[0].subprofiles[1].weight, 1, "Just leaf2.")
 
 	def test_get_profiles_settings(self):
 		"""
@@ -68,12 +68,12 @@ class TestOptimise(unittest.TestCase):
 		"""
 		input_directory = os.path.join(self.data_directory, "simple_tree")
 		profile = optimise.get_profiles(input_directory)
-		assert profile.settings["apples"] == "3"
-		assert profile.settings["oranges"] == "5"
-		assert profile.settings["bananas"] == "-1"
-		assert profile.subprofiles[0].settings["apples"] == "4"
-		assert profile.subprofiles[0].subprofiles[0].settings["apples"] == "5"
-		assert profile.subprofiles[0].subprofiles[1].settings["apples"] == "6"
+		self.assertEqual(profile.settings["apples"], "3", "Apples is set to 3 in simple_tree.inst.cfg.")
+		self.assertEqual(profile.settings["oranges"], "5", "Oranges is set to 5 in simple_tree.inst.cfg.")
+		self.assertEqual(profile.settings["bananas"], "-1", "Bananas is set to -1 in simple_tree.inst.cfg.")
+		self.assertEqual(profile.subprofiles[0].settings["apples"], "4", "Apples is overridden to 4 in subprofile.inst.cfg.")
+		self.assertEqual(profile.subprofiles[0].subprofiles[0].settings["apples"], "5", "Apples is overridden to 5 in leaf1.inst.cfg.")
+		self.assertEqual(profile.subprofiles[0].subprofiles[1].settings["apples"], "6", "Apples is overridden to 6 in leaf2.inst.cfg.")
 
 	def test_get_profiles_empty_directory(self):
 		"""

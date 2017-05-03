@@ -314,6 +314,17 @@ class TestOptimise(unittest.TestCase, metaclass=tests.tests.TestMeta):
 		optimise.remove_redundancies(parent)
 		self.assertDictEqual(child.settings, {}, "The profile should still be empty.")
 
+	def test_remove_redundancies_material_settings(self):
+		"""
+		Tests whether non-material settings ignore material profiles for
+		redundancy checks.
+		"""
+		quality = optimise.Profile(settings={"material_bed_temperature": 60, "layer_height": 0.1337})
+		material = optimise.Profile(settings={"material_bed_temperature": 70, "layer_height": 0.2337}, filepath="/path/to/PLA.inst.cfg", subprofiles=[quality])
+		variant = optimise.Profile(settings={"material_bed_temperature": 60, "layer_height": 0.1337}, subprofiles=[material])
+		optimise.remove_redundancies(variant)
+		self.assertDictEqual(quality.settings, {"material_bed_temperature": 60}, "Bed temperature is a material setting so it should override the material. Layer height is not a material setting so it should ignore the value in the material.")
+
 	def test_remove_redundancies_grandchildren(self):
 		"""
 		Tests removing redundant settings through multiple layers.

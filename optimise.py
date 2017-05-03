@@ -170,7 +170,7 @@ def bubble_common_values(profile, bubble_from_depth):
 				value = subprofile.settings[key]
 				if value not in value_counts:
 					value_counts[value] = 0
-				value_counts[value] += 1
+				value_counts[value] += subprofile.weight
 		else: #Setting may not occur in a material profile. Skip all material profiles in the bubbling.
 			if is_material(profile): #We can't store the setting in this profile, so don't update the profile.
 				continue
@@ -180,12 +180,12 @@ def bubble_common_values(profile, bubble_from_depth):
 						value = subsubprofile.settings[key]
 						if value not in value_counts:
 							value_counts[value] = 0
-						value_counts[value] += 1
+						value_counts[value] += subsubprofile.weight
 				else:
 					value = subprofile.settings[key]
 					if value not in value_counts:
 						value_counts[value] = 0
-					value_counts[value] += 1
+					value_counts[value] += subprofile.weight
 		most_common_value = None
 		highest_count = -1
 		for value, count in value_counts.items():

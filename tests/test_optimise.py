@@ -33,6 +33,19 @@ class TestOptimise(unittest.TestCase, metaclass=tests.tests.TestMeta):
 		optimise.bubble_common_values(parent, 0)
 		self.assertDictEqual(parent.settings, {})
 
+	def test_bubble_common_values_1v1(self):
+		"""
+		Tests bubbling with two children, each saying something different.
+
+		This results in a tie, so the parent should get the value that sorts
+		earliest as a tie breaker.
+		"""
+		child1 = optimise.Profile(settings={"apples": 3})
+		child2 = optimise.Profile(settings={"apples": 2})
+		parent = optimise.Profile(settings={"apples": 1}, subprofiles=[child1, child2], weight=2)
+		optimise.bubble_common_values(parent, 0)
+		self.assertDictEqual(parent.settings, {"apples": 2}, "It's a tie between apples=2 and apples=3. The lexicographical sorting says we should pick apples=2 then.")
+
 	def test_bubble_common_values_2v1(self):
 		"""
 		Tests bubbling with three children, of which two have the same value.

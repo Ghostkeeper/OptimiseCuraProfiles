@@ -33,6 +33,20 @@ class TestOptimise(unittest.TestCase, metaclass=tests.tests.TestMeta):
 		optimise.bubble_common_values(parent, 0)
 		self.assertDictEqual(parent.settings, {})
 
+	def test_bubble_common_values_2v1(self):
+		"""
+		Tests bubbling with three children, of which two have the same value.
+
+		Since the value of the two are more common than the value of the last
+		one, the parent should take the value of the two.
+		"""
+		child1 = optimise.Profile(settings={"apples": 3})
+		child2 = optimise.Profile(settings={"apples": 4})
+		child3 = optimise.Profile(settings={"apples": 3})
+		parent = optimise.Profile(settings={"apples": 2}, subprofiles=[child1, child2, child3], weight=3)
+		optimise.bubble_common_values(parent, 0)
+		self.assertDictEqual(parent.settings, {"apples": 3}, "The apples=3 setting is more common among its children.")
+
 	def test_get_profiles_filepath(self):
 		"""
 		Tests whether the file path is stored correctly in the profiles.

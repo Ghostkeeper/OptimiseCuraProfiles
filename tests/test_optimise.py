@@ -304,3 +304,13 @@ class TestOptimise(unittest.TestCase, metaclass=tests.tests.TestMeta):
 		json_file = os.path.join(self.data_directory, json_file)
 		profile = optimise.parse_json(json_file)
 		self.assertDictEqual(profile.settings, settings)
+
+	def test_remove_redundancies_root(self):
+		"""
+		Tests removing redundant settings of the root profile.
+
+		In the root profile, no settings are redundant.
+		"""
+		root = optimise.Profile(settings={"foo": "bar"})
+		optimise.remove_redundancies(root)
+		self.assertDictEqual(root.settings, {"foo": "bar"}, "The settings of the root should be untouched.")

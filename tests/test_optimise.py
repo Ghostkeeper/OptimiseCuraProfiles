@@ -116,13 +116,13 @@ class TestOptimise(unittest.TestCase, metaclass=tests.tests.TestMeta):
 		"""
 		Tests whether loaded profiles get assigned the correct weights.
 
-		The weight of a profile should indicate the number of profiles it
+		The weight of a profile should indicate the number of leaf profiles it
 		encompasses.
 		"""
 		input_directory = os.path.join(self.data_directory, "simple_tree")
 		profile = optimise.get_profiles(input_directory)
-		self.assertEqual(profile.weight, 4, "There is the root test data, the subdirectory, leaf1 and leaf2.")
-		self.assertEqual(profile.subprofiles[0].weight, 3, "There is the subdirectory, leaf1 and leaf2.")
+		self.assertEqual(profile.weight, 2, "Has both leaf1 and leaf2.")
+		self.assertEqual(profile.subprofiles[0].weight, 2, "Still has both leaf1 and leaf2.")
 		self.assertEqual(profile.subprofiles[0].subprofiles[0].weight, 1, "Just leaf1.")
 		self.assertEqual(profile.subprofiles[0].subprofiles[1].weight, 1, "Just leaf2.")
 

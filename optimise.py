@@ -32,7 +32,7 @@ class Profile:
 		self.settings = settings #Dictionary of settings.
 		self.subprofiles = subprofiles #Set of other Profile instances.
 		self.baseconfig = baseconfig #ConfigParser instance without all the settings filled in.
-		self.weight = weight #How much the profile counts in the decision which is the most common value.
+		self.weight = weight #How much the profile counts in the decision which is the most common value. Equal to the number of leaf profiles.
 
 material_profiles = {"PLA", "ABS", "CPE", "Nylon", "PVA", "CPEP", "PC", "TPU"} #Material profiles can only have material settings. TODO: Don't hard-code these, but get them based on XML input.
 material_settings = {
@@ -95,6 +95,7 @@ def get_profiles(input_dir):
 	for file in files:
 		if file.split(".")[0] == this_directory: #Named similarly.
 			base_profile = parse(os.path.join(input_dir, file))
+			base_profile.weight = 0
 			break
 	else: #There was no common file for this directory.
 		base_profile = Profile(filepath=os.path.join(input_dir, this_directory + ".inst.cfg"), weight=0)

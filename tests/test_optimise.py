@@ -21,6 +21,18 @@ class TestOptimise(unittest.TestCase, metaclass=tests.tests.TestMeta):
 	A data directory to load test files from.
 	"""
 
+	def test_bubble_common_values_empty(self):
+		"""
+		Tests bubbling common values through profiles that are empty.
+
+		That should obviously have no effect.
+		"""
+		child1 = optimise.Profile()
+		child2 = optimise.Profile()
+		parent = optimise.Profile(subprofiles=[child1, child2])
+		optimise.bubble_common_values(parent, 0)
+		self.assertDictEqual(parent.settings, {})
+
 	def test_get_profiles_filepath(self):
 		"""
 		Tests whether the file path is stored correctly in the profiles.

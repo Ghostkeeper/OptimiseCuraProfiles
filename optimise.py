@@ -21,7 +21,7 @@ bubble_from_depth = 0
 track_setting = ""
 logging.basicConfig(level=logging.DEBUG)
 class Profile:
-	def __init__(self, filepath="Unknown", settings=None, subprofiles=None, baseconfig=None, weight=1): #The `None` are sentry values.
+	def __init__(self, filepath: str="Unknown", settings=None, subprofiles=None, baseconfig=None, weight=1): #The `None` are sentry values.
 		if not settings:
 			settings = {}
 		if not subprofiles:

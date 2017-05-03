@@ -31,7 +31,7 @@ class TestOptimise(unittest.TestCase, metaclass=tests.tests.TestMeta):
 		child2 = optimise.Profile()
 		parent = optimise.Profile(subprofiles=[child1, child2])
 		optimise.bubble_common_values(parent, 0)
-		self.assertDictEqual(parent.settings, {})
+		self.assertDictEqual(parent.settings, {}, "The settings should still be empty after bubbling.")
 
 	def test_bubble_common_values_1v1(self):
 		"""

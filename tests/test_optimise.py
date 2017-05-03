@@ -21,18 +21,6 @@ class TestOptimise(unittest.TestCase, metaclass=tests.tests.TestMeta):
 	A data directory to load test files from.
 	"""
 
-	def test_bubble_common_values_empty(self):
-		"""
-		Tests bubbling common values through profiles that are empty.
-
-		That should obviously have no effect.
-		"""
-		child1 = optimise.Profile()
-		child2 = optimise.Profile()
-		parent = optimise.Profile(subprofiles=[child1, child2])
-		optimise.bubble_common_values(parent, 0)
-		self.assertDictEqual(parent.settings, {}, "The settings should still be empty after bubbling.")
-
 	def test_bubble_common_values_1v1(self):
 		"""
 		Tests bubbling with two children, each saying something different.
@@ -73,6 +61,18 @@ class TestOptimise(unittest.TestCase, metaclass=tests.tests.TestMeta):
 		optimise.bubble_common_values(parent, 0)
 		self.assertDictEqual(parent.settings, {"apples": 2}, "The apples=2 setting is just as common as apples=3 if you don't count the parent, and apples=2 sorts earlier.")
 
+	def test_bubble_common_values_empty(self):
+		"""
+		Tests bubbling common values through profiles that are empty.
+
+		That should obviously have no effect.
+		"""
+		child1 = optimise.Profile()
+		child2 = optimise.Profile()
+		parent = optimise.Profile(subprofiles=[child1, child2])
+		optimise.bubble_common_values(parent, 0)
+		self.assertDictEqual(parent.settings, {}, "The settings should still be empty after bubbling.")
+
 	def test_bubble_common_values_weighted(self):
 		"""
 		Tests whether bubbling properly takes weights of profiles into account.
@@ -83,69 +83,6 @@ class TestOptimise(unittest.TestCase, metaclass=tests.tests.TestMeta):
 		parent = optimise.Profile(settings={"apples": 2}, subprofiles=[child1, child2, child3], weight=5)
 		optimise.bubble_common_values(parent, 0)
 		self.assertDictEqual(parent.settings, {"apples": 4}, "The profile that says that apples=4 weighs more than the other child profiles together.")
-
-	def test_get_profiles_filepath(self):
-		"""
-		Tests whether the file path is stored correctly in the profiles.
-		"""
-		input_directory = os.path.join(self.data_directory, "simple_tree")
-		profile = optimise.get_profiles(input_directory)
-		self.assertEqual(profile.filepath, os.path.join(input_directory, "simple_tree.inst.cfg"), "The file is in simple_tree/simple_tree.inst.cfg.")
-
-	def test_get_profiles_children(self):
-		"""
-		Tests whether the children are properly found when loading profiles.
-		"""
-		input_directory = os.path.join(self.data_directory, "simple_tree")
-		profile = optimise.get_profiles(input_directory)
-		self.assertEqual(len(profile.subprofiles), 1, "There is only one child, 'subdirectory'.")
-		self.assertEqual(profile.subprofiles[0].filepath, os.path.join(input_directory, "subdirectory", "subdirectory.inst.cfg"), "The child is in the test_data/subdirectory/subdirectory.inst.cfg file.")
-
-	def test_get_profiles_grandchildren(self):
-		"""
-		Tests whether the grandchildren are properly found when loading
-		profiles.
-		"""
-		input_directory = os.path.join(self.data_directory, "simple_tree")
-		profile = optimise.get_profiles(input_directory)
-		self.assertEqual(len(profile.subprofiles[0].subprofiles), 2, "There are two grandchildren under the 'subdirectory' directory.")
-		self.assertEqual(profile.subprofiles[0].subprofiles[0].filepath, os.path.join(input_directory, "subdirectory", "leaf1.inst.cfg"), "The first grandchild is leaf1. It must be sorted.")
-		self.assertEqual(profile.subprofiles[0].subprofiles[1].filepath, os.path.join(input_directory, "subdirectory", "leaf2.inst.cfg"), "The second grandchild is leaf2. It must be sorted.")
-
-	def test_get_profiles_weight(self):
-		"""
-		Tests whether loaded profiles get assigned the correct weights.
-
-		The weight of a profile should indicate the number of leaf profiles it
-		encompasses.
-		"""
-		input_directory = os.path.join(self.data_directory, "simple_tree")
-		profile = optimise.get_profiles(input_directory)
-		self.assertEqual(profile.weight, 2, "Has both leaf1 and leaf2.")
-		self.assertEqual(profile.subprofiles[0].weight, 2, "Still has both leaf1 and leaf2.")
-		self.assertEqual(profile.subprofiles[0].subprofiles[0].weight, 1, "Just leaf1.")
-		self.assertEqual(profile.subprofiles[0].subprofiles[1].weight, 1, "Just leaf2.")
-
-	def test_get_profiles_settings(self):
-		"""
-		Tests whether loaded profiles have the correct settings.
-		"""
-		input_directory = os.path.join(self.data_directory, "simple_tree")
-		profile = optimise.get_profiles(input_directory)
-		self.assertEqual(profile.settings["apples"], "3", "Apples is set to 3 in simple_tree.inst.cfg.")
-		self.assertEqual(profile.settings["oranges"], "5", "Oranges is set to 5 in simple_tree.inst.cfg.")
-		self.assertEqual(profile.settings["bananas"], "-1", "Bananas is set to -1 in simple_tree.inst.cfg.")
-		self.assertEqual(profile.subprofiles[0].settings["apples"], "4", "Apples is overridden to 4 in subprofile.inst.cfg.")
-		self.assertEqual(profile.subprofiles[0].subprofiles[0].settings["apples"], "5", "Apples is overridden to 5 in leaf1.inst.cfg.")
-		self.assertEqual(profile.subprofiles[0].subprofiles[1].settings["apples"], "6", "Apples is overridden to 6 in leaf2.inst.cfg.")
-
-	def test_get_profiles_empty_directory(self):
-		"""
-		Tests getting profiles from a directory that is empty.
-		"""
-		temporary_directory = tempfile.TemporaryDirectory()
-		with self.assertRaises(FileNotFoundError):
-			optimise.get_profiles(temporary_directory.name) #Because it's an empty directory.
 
 	def test_flatten_profiles_empty(self):
 		"""
@@ -210,6 +147,95 @@ class TestOptimise(unittest.TestCase, metaclass=tests.tests.TestMeta):
 		optimise.flatten_profiles(parent_profile)
 		self.assertDictEqual(empty_profile.settings, {"foo": "bar"}, "Flattened profile must now have all settings from its parents.")
 
+	def test_get_profiles_children(self):
+		"""
+		Tests whether the children are properly found when loading profiles.
+		"""
+		input_directory = os.path.join(self.data_directory, "simple_tree")
+		profile = optimise.get_profiles(input_directory)
+		self.assertEqual(len(profile.subprofiles), 1, "There is only one child, 'subdirectory'.")
+		self.assertEqual(profile.subprofiles[0].filepath, os.path.join(input_directory, "subdirectory", "subdirectory.inst.cfg"), "The child is in the test_data/subdirectory/subdirectory.inst.cfg file.")
+
+	def test_get_profiles_empty_directory(self):
+		"""
+		Tests getting profiles from a directory that is empty.
+		"""
+		temporary_directory = tempfile.TemporaryDirectory()
+		with self.assertRaises(FileNotFoundError):
+			optimise.get_profiles(temporary_directory.name) #Because it's an empty directory.
+
+	def test_get_profiles_filepath(self):
+		"""
+		Tests whether the file path is stored correctly in the profiles.
+		"""
+		input_directory = os.path.join(self.data_directory, "simple_tree")
+		profile = optimise.get_profiles(input_directory)
+		self.assertEqual(profile.filepath, os.path.join(input_directory, "simple_tree.inst.cfg"), "The file is in simple_tree/simple_tree.inst.cfg.")
+
+	def test_get_profiles_grandchildren(self):
+		"""
+		Tests whether the grandchildren are properly found when loading
+		profiles.
+		"""
+		input_directory = os.path.join(self.data_directory, "simple_tree")
+		profile = optimise.get_profiles(input_directory)
+		self.assertEqual(len(profile.subprofiles[0].subprofiles), 2, "There are two grandchildren under the 'subdirectory' directory.")
+		self.assertEqual(profile.subprofiles[0].subprofiles[0].filepath, os.path.join(input_directory, "subdirectory", "leaf1.inst.cfg"), "The first grandchild is leaf1. It must be sorted.")
+		self.assertEqual(profile.subprofiles[0].subprofiles[1].filepath, os.path.join(input_directory, "subdirectory", "leaf2.inst.cfg"), "The second grandchild is leaf2. It must be sorted.")
+
+	def test_get_profiles_settings(self):
+		"""
+		Tests whether loaded profiles have the correct settings.
+		"""
+		input_directory = os.path.join(self.data_directory, "simple_tree")
+		profile = optimise.get_profiles(input_directory)
+		self.assertEqual(profile.settings["apples"], "3", "Apples is set to 3 in simple_tree.inst.cfg.")
+		self.assertEqual(profile.settings["oranges"], "5", "Oranges is set to 5 in simple_tree.inst.cfg.")
+		self.assertEqual(profile.settings["bananas"], "-1", "Bananas is set to -1 in simple_tree.inst.cfg.")
+		self.assertEqual(profile.subprofiles[0].settings["apples"], "4", "Apples is overridden to 4 in subprofile.inst.cfg.")
+		self.assertEqual(profile.subprofiles[0].subprofiles[0].settings["apples"], "5", "Apples is overridden to 5 in leaf1.inst.cfg.")
+		self.assertEqual(profile.subprofiles[0].subprofiles[1].settings["apples"], "6", "Apples is overridden to 6 in leaf2.inst.cfg.")
+
+	def test_get_profiles_weight(self):
+		"""
+		Tests whether loaded profiles get assigned the correct weights.
+
+		The weight of a profile should indicate the number of leaf profiles it
+		encompasses.
+		"""
+		input_directory = os.path.join(self.data_directory, "simple_tree")
+		profile = optimise.get_profiles(input_directory)
+		self.assertEqual(profile.weight, 2, "Has both leaf1 and leaf2.")
+		self.assertEqual(profile.subprofiles[0].weight, 2, "Still has both leaf1 and leaf2.")
+		self.assertEqual(profile.subprofiles[0].subprofiles[0].weight, 1, "Just leaf1.")
+		self.assertEqual(profile.subprofiles[0].subprofiles[1].weight, 1, "Just leaf2.")
+
+	@tests.tests.parametrise({
+		"empty": {
+			"cfg_file": "empty.inst.cfg",
+			"settings": {} #Should not give an error that the 'values' section could not be found!
+		},
+		"simple": {
+			"cfg_file": "simple.inst.cfg",
+			"settings": {"foo": "bar"}
+		},
+		"multiple": {
+			"cfg_file": "multiple.inst.cfg",
+			"settings": {"foo": "3", "bar": "4"}
+		}
+	})
+	def test_parse_cfg(self, cfg_file, settings):
+		"""
+		Tests whether CFG files are correctly parsed.
+		:param cfg_file: The file to test parsing, relative to the test data
+		directory.
+		:param settings: A dictionary that specifies for each key that should be
+		found what value should be found.
+		"""
+		cfg_file = os.path.join(self.data_directory, cfg_file)
+		profile = optimise.parse_cfg(cfg_file)
+		self.assertDictEqual(profile.settings, settings)
+
 	@tests.tests.parametrise({
 		"empty": {
 			"json_file": "empty.def.json",
@@ -254,30 +280,4 @@ class TestOptimise(unittest.TestCase, metaclass=tests.tests.TestMeta):
 		"""
 		json_file = os.path.join(self.data_directory, json_file)
 		profile = optimise.parse_json(json_file)
-		self.assertDictEqual(profile.settings, settings)
-
-	@tests.tests.parametrise({
-		"empty": {
-			"cfg_file": "empty.inst.cfg",
-			"settings": {} #Should not give an error that the 'values' section could not be found!
-		},
-		"simple": {
-			"cfg_file": "simple.inst.cfg",
-			"settings": {"foo": "bar"}
-		},
-		"multiple": {
-			"cfg_file": "multiple.inst.cfg",
-			"settings": {"foo": "3", "bar": "4"}
-		}
-	})
-	def test_parse_cfg(self, cfg_file, settings):
-		"""
-		Tests whether CFG files are correctly parsed.
-		:param cfg_file: The file to test parsing, relative to the test data
-		directory.
-		:param settings: A dictionary that specifies for each key that should be
-		found what value should be found.
-		"""
-		cfg_file = os.path.join(self.data_directory, cfg_file)
-		profile = optimise.parse_cfg(cfg_file)
 		self.assertDictEqual(profile.settings, settings)

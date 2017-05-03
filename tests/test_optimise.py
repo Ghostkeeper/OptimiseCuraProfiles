@@ -93,6 +93,18 @@ class TestOptimise(unittest.TestCase, metaclass=tests.tests.TestMeta):
 		optimise.flatten_profiles(profile) #No parent.
 		self.assertDictEqual(profile.settings, {}, "Flattened settings must still be empty.")
 
+	def test_flatten_profiles_transparent(self):
+		"""
+		Tests flattening an empty profile with a parent that's not empty.
+
+		All settings of the parent must be included in the originally empty
+		profile.
+		"""
+		empty_profile = optimise.Profile(filepath="<string>", settings={}, subprofiles=set(), baseconfig=configparser.ConfigParser(), weight=1)
+		parent_profile = optimise.Profile(filepath="<string>", settings={"foo": "bar"}, subprofiles={empty_profile}, baseconfig=configparser.ConfigParser(), weight=2)
+		optimise.flatten_profiles(parent_profile)
+		self.assertDictEqual(empty_profile.settings, {"foo": "bar"}, "Flattened profile must now have all settings from its parents.")
+
 	@tests.tests.parametrise({
 		"empty": {
 			"json_file": "empty.def.json",

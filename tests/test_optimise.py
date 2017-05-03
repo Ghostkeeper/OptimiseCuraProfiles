@@ -60,6 +60,19 @@ class TestOptimise(unittest.TestCase, metaclass=tests.tests.TestMeta):
 		optimise.bubble_common_values(parent, 0)
 		self.assertDictEqual(parent.settings, {"apples": 3}, "The apples=3 setting is more common among its children.")
 
+	def test_bubble_common_values_dont_include_parent(self):
+		"""
+		Tests whether bubbling counts the parent among the most common values.
+
+		The parent should not be counted to determine which values are most
+		common. 
+		"""
+		child1 = optimise.Profile(settings={"apples": 3})
+		child2 = optimise.Profile(settings={"apples": 2})
+		parent = optimise.Profile(settings={"apples": 3}, subprofiles=[child1, child2], weight=2)
+		optimise.bubble_common_values(parent, 0)
+		self.assertDictEqual(parent.settings, {"apples": 2}, "The apples=2 setting is just as common as apples=3 if you don't count the parent, and apples=2 sorts earlier.")
+
 	def test_get_profiles_filepath(self):
 		"""
 		Tests whether the file path is stored correctly in the profiles.

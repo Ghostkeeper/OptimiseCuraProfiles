@@ -93,6 +93,16 @@ class TestOptimise(unittest.TestCase, metaclass=tests.tests.TestMeta):
 		optimise.flatten_profiles(profile) #No parent.
 		self.assertDictEqual(profile.settings, {}, "Flattened settings must still be empty.")
 
+	def test_flatten_profiles_merge(self):
+		"""
+		Tests flattening a profile that inherits one setting from a parent but
+		overwrites another setting.
+		"""
+		child = optimise.Profile(filepath="<string>", settings={"apples": 4}, subprofiles=set(), baseconfig=configparser.ConfigParser(), weight=1)
+		parent = optimise.Profile(filepath="<string>", settings={"apples": 3, "pears": 8}, subprofiles={child}, baseconfig=configparser.ConfigParser(), weight=2)
+		optimise.flatten_profiles(parent)
+		self.assertDictEqual(child.settings, {"apples": 4, "pears": 8}, "The apples are overwritten but the pears are inheriting from the parent.")
+
 	def test_flatten_profiles_override(self):
 		"""
 		Tests flattening a profile that overrides all its parent's settings.
@@ -100,7 +110,7 @@ class TestOptimise(unittest.TestCase, metaclass=tests.tests.TestMeta):
 		The result is that the profile is unchanged, since it was already flat.
 		"""
 		child = optimise.Profile(filepath="<string>", settings={"apples": 4}, subprofiles=set(), baseconfig=configparser.ConfigParser(), weight=1)
-		parent = optimise.Profile(filepath="<string>", settings={"apples": 3}, subprofiles={child}, baseconfig=configparser.ConfigParser(), weight=1)
+		parent = optimise.Profile(filepath="<string>", settings={"apples": 3}, subprofiles={child}, baseconfig=configparser.ConfigParser(), weight=2)
 		optimise.flatten_profiles(parent)
 		self.assertDictEqual(child.settings, {"apples": 4}, "The child profile must retain its overwriting value for apples=4.")
 
@@ -111,7 +121,7 @@ class TestOptimise(unittest.TestCase, metaclass=tests.tests.TestMeta):
 		It shouldn't change the profile in any way, then.
 		"""
 		subprofile = optimise.Profile(filepath="<string>", settings={"apples": 3}, subprofiles=set(), baseconfig=configparser.ConfigParser(), weight=1)
-		profile = optimise.Profile(filepath="<string>", settings={"foo": "bar"}, subprofiles={subprofile}, baseconfig=configparser.ConfigParser(), weight=1)
+		profile = optimise.Profile(filepath="<string>", settings={"foo": "bar"}, subprofiles={subprofile}, baseconfig=configparser.ConfigParser(), weight=2)
 		optimise.flatten_profiles(profile)
 		self.assertDictEqual(profile.settings, {"foo": "bar"}, "The root profile must not be altered.")
 

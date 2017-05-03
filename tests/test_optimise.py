@@ -314,6 +314,19 @@ class TestOptimise(unittest.TestCase, metaclass=tests.tests.TestMeta):
 		optimise.remove_redundancies(parent)
 		self.assertDictEqual(child.settings, {}, "The profile should still be empty.")
 
+	def test_remove_redundancies_mixed(self):
+		"""
+		Tests removing redundancies where only part of the settings are
+		redundant.
+
+		It shouldn't remove all of them or none, since the settings are
+		redundant, not the profiles.
+		"""
+		child = optimise.Profile(settings={"apples": 4, "pears": 8})
+		parent = optimise.Profile(settings={"apples": 3, "pears": 8}, subprofiles=[child])
+		optimise.remove_redundancies(parent)
+		self.assertDictEqual(child.settings, {"apples": 4}, "Apples overrides its parent, but pears was the same as its parent so pears was redundant.")
+
 	def test_remove_redundancies_not_redundant(self):
 		"""
 		Tests whether it properly retains settings that are not redundant.

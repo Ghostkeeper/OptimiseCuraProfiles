@@ -73,6 +73,17 @@ class TestOptimise(unittest.TestCase, metaclass=tests.tests.TestMeta):
 		optimise.bubble_common_values(parent, 0)
 		self.assertDictEqual(parent.settings, {}, "The settings should still be empty after bubbling.")
 
+	def test_bubble_common_values_skip(self):
+		"""
+		Tests skipping up until some level of profiles.
+		"""
+		grandchild = optimise.Profile(settings={"apples": 3})
+		child = optimise.Profile(settings={"apples": 2}, subprofiles=[grandchild])
+		parent = optimise.Profile(settings={"apples": 1}, subprofiles=[child])
+		optimise.bubble_common_values(parent, 1)
+		self.assertDictEqual(parent.settings, {"apples": 1}, "The profile at level 0 should not be bubbled to.")
+		self.assertDictEqual(child.settings, {"apples": 3}, "The profile at level 1 should be bubbled to.")
+
 	def test_bubble_common_values_weighted(self):
 		"""
 		Tests whether bubbling properly takes weights of profiles into account.

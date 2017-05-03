@@ -312,7 +312,7 @@ class TestOptimise(unittest.TestCase, metaclass=tests.tests.TestMeta):
 		child = optimise.Profile()
 		parent = optimise.Profile(subprofiles=[child])
 		optimise.remove_redundancies(parent)
-		self.assertDictEqual(child.settings, {})
+		self.assertDictEqual(child.settings, {}, "The profile should still be empty.")
 
 	def test_remove_redundancies_not_redundant(self):
 		"""
@@ -323,7 +323,17 @@ class TestOptimise(unittest.TestCase, metaclass=tests.tests.TestMeta):
 		child = optimise.Profile(settings={"apples": 4})
 		parent = optimise.Profile(settings={"apples": 3}, subprofiles=[child])
 		optimise.remove_redundancies(parent)
-		self.assertDictEqual(child.settings, {"apples": 4})
+		self.assertDictEqual(child.settings, {"apples": 4}, "The child setting differs from its parent, so it's not redundant.")
+
+	def test_remove_redundancies_redundant(self):
+		"""
+		Tests whether it removes settings that are equal to the parent setting.
+		"""
+		child = optimise.Profile(settings={"apples": 3})
+		parent = optimise.Profile(settings={"apples": 3}, subprofiles=[child])
+		optimise.remove_redundancies(parent)
+		self.assertDictEqual(child.settings, {}, "The child setting is equal to its parent, so it's redundant and should be removed.")
+		self.assertDictEqual(parent.settings, {"apples": 3}, "The parent setting should not get removed, since the child depends on it.")
 
 	def test_remove_redundancies_root(self):
 		"""

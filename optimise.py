@@ -21,7 +21,13 @@ bubble_from_depth = 0
 track_setting = ""
 logging.basicConfig(level=logging.DEBUG)
 class Profile:
-	def __init__(self, filepath, settings, subprofiles, baseconfig, weight):
+	def __init__(self, filepath="Unknown", settings=None, subprofiles=None, baseconfig=None, weight=1): #The `None` are sentry values.
+		if not settings:
+			settings = {}
+		if not subprofiles:
+			subprofiles = []
+		if not baseconfig:
+			baseconfig = configparser.ConfigParser()
 		self.filepath = filepath #Path string.
 		self.settings = settings #Dictionary of settings.
 		self.subprofiles = subprofiles #Set of other Profile instances.
@@ -91,13 +97,7 @@ def get_profiles(input_dir):
 			base_profile = parse(os.path.join(input_dir, file))
 			break
 	else: #There was no common file for this directory.
-		base_profile = Profile(
-			filepath=os.path.join(input_dir, this_directory + ".inst.cfg"),
-			settings={},
-			subprofiles=[],
-			baseconfig=configparser.ConfigParser(),
-			weight=0
-		)
+		base_profile = Profile(filepath=os.path.join(input_dir, this_directory + ".inst.cfg"), weight=0)
 
 	if directories: #Not a leaf node.
 		for directory in directories:
@@ -287,13 +287,7 @@ def parse_cfg(file):
 	:return: A Profile instance, instantiated with all the settings from the
 	file.
 	"""
-	result = Profile( #An empty profile.
-		filepath=file,
-		settings={},
-		subprofiles=[],
-		baseconfig=configparser.ConfigParser(),
-		weight=1
-	)
+	result = Profile(filepath=file) #An empty profile.
 
 	data = configparser.ConfigParser() #Input file.
 	data.read(file)
@@ -316,13 +310,7 @@ def parse_json(file):
 	:return: A Profile instance, instantiated with all the settings from the
 	file.
 	"""
-	result = Profile( #An empty profile.
-		filepath=file,
-		settings={},
-		subprofiles=[],
-		baseconfig=configparser.ConfigParser(), #TODO: Make this base config a basic JSON file if we're going to be writing JSON as well.
-		weight=1
-	)
+	result = Profile(filepath=file) #An empty profile.
 	with open(file) as json_file:
 		data = json.load(json_file)
 

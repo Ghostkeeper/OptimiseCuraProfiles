@@ -73,6 +73,17 @@ class TestOptimise(unittest.TestCase, metaclass=tests.tests.TestMeta):
 		optimise.bubble_common_values(parent, 0)
 		self.assertDictEqual(parent.settings, {"apples": 2}, "The apples=2 setting is just as common as apples=3 if you don't count the parent, and apples=2 sorts earlier.")
 
+	def test_bubble_common_values_weighted(self):
+		"""
+		Tests whether bubbling properly takes weights of profiles into account.
+		"""
+		child1 = optimise.Profile(settings={"apples": 3})
+		child2 = optimise.Profile(settings={"apples": 3})
+		child3 = optimise.Profile(settings={"apples": 4}, weight = 3) #This is the fat kid that bullies the other ones all the time.
+		parent = optimise.Profile(settings={"apples": 2}, subprofiles=[child1, child2, child3], weight=5)
+		optimise.bubble_common_values(parent, 0)
+		self.assertDictEqual(parent.settings, {"apples": 4}, "The profile that says that apples=4 weighs more than the other child profiles together.")
+
 	def test_get_profiles_filepath(self):
 		"""
 		Tests whether the file path is stored correctly in the profiles.

@@ -93,6 +93,17 @@ class TestOptimise(unittest.TestCase, metaclass=tests.tests.TestMeta):
 		optimise.flatten_profiles(profile) #No parent.
 		self.assertDictEqual(profile.settings, {}, "Flattened settings must still be empty.")
 
+	def test_flatten_profiles_override(self):
+		"""
+		Tests flattening a profile that overrides all its parent's settings.
+
+		The result is that the profile is unchanged, since it was already flat.
+		"""
+		child = optimise.Profile(filepath="<string>", settings={"apples": 4}, subprofiles=set(), baseconfig=configparser.ConfigParser(), weight=1)
+		parent = optimise.Profile(filepath="<string>", settings={"apples": 3}, subprofiles={child}, baseconfig=configparser.ConfigParser(), weight=1)
+		optimise.flatten_profiles(parent)
+		self.assertDictEqual(child.settings, {"apples": 4}, "The child profile must retain its overwriting value for apples=4.")
+
 	def test_flatten_profiles_root(self):
 		"""
 		Tests flattening a profile that is already the root.

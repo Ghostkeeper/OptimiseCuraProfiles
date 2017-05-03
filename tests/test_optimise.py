@@ -4,6 +4,7 @@
 #This software is distributed under the Creative Commons license (CC0) version 1.0. A copy of this license should have been distributed with this software.
 #The license can also be read online: <https://creativecommons.org/publicdomain/zero/1.0/>. If this online license differs from the license provided with this software, the license provided with this software should be applied.
 
+import configparser #To generate custom profiles and initialise them with a configparser.
 import os.path #To get a directory with test files.
 import tempfile #To create a temporary empty directory. You can't have empty directory in Git.
 import unittest #The testing suite.
@@ -83,6 +84,20 @@ class TestOptimise(unittest.TestCase, metaclass=tests.tests.TestMeta):
 		temporary_directory = tempfile.TemporaryDirectory()
 		with self.assertRaises(FileNotFoundError):
 			optimise.get_profiles(temporary_directory.name) #Because it's an empty directory.
+
+	@tests.tests.parametrise({
+		"empty": {
+			"profile": optimise.Profile("<string>", settings={}, subprofiles=set(), baseconfig=configparser.ConfigParser(), weight=1),
+			"all_settings": {}
+		}
+	})
+	def test_flatten_profiles(self, profile, all_settings):
+		"""
+		Tests flattening a profile.
+		:param profile: A non-flat profile which must be flattened.
+		"""
+		optimise.flatten_profiles(profile)
+		self.assertDictEqual(all_settings, profile.settings, "The flattened settings must be equal to the settings specified in the test parameters.")
 
 	@tests.tests.parametrise({
 		"empty": {

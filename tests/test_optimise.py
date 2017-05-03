@@ -85,19 +85,13 @@ class TestOptimise(unittest.TestCase, metaclass=tests.tests.TestMeta):
 		with self.assertRaises(FileNotFoundError):
 			optimise.get_profiles(temporary_directory.name) #Because it's an empty directory.
 
-	@tests.tests.parametrise({
-		"empty": {
-			"profile": optimise.Profile("<string>", settings={}, subprofiles=set(), baseconfig=configparser.ConfigParser(), weight=1),
-			"all_settings": {}
-		}
-	})
-	def test_flatten_profiles(self, profile, all_settings):
+	def test_flatten_profiles_empty(self):
 		"""
-		Tests flattening a profile.
-		:param profile: A non-flat profile which must be flattened.
+		Tests flattening an empty profile.
 		"""
-		optimise.flatten_profiles(profile)
-		self.assertDictEqual(all_settings, profile.settings, "The flattened settings must be equal to the settings specified in the test parameters.")
+		profile = optimise.Profile(filepath="<string>", settings={}, subprofiles=set(), baseconfig=configparser.ConfigParser(), weight=1) #Nothing in it.
+		optimise.flatten_profiles(profile) #No parent.
+		self.assertDictEqual(profile.settings, {}, "Flattened settings must still be empty.")
 
 	@tests.tests.parametrise({
 		"empty": {

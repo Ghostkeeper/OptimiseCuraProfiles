@@ -93,6 +93,17 @@ class TestOptimise(unittest.TestCase, metaclass=tests.tests.TestMeta):
 		optimise.flatten_profiles(profile) #No parent.
 		self.assertDictEqual(profile.settings, {}, "Flattened settings must still be empty.")
 
+	def test_flatten_profiles_grandchildren(self):
+		"""
+		Tests whether flattening a profile has an effect through multiple layers
+		of profiles.
+		"""
+		grandchild = optimise.Profile(filepath="<string>", settings={}, subprofiles=set(), baseconfig=configparser.ConfigParser(), weight=1)
+		child = optimise.Profile(filepath="<string>", settings={}, subprofiles={grandchild}, baseconfig=configparser.ConfigParser(), weight=2)
+		parent = optimise.Profile(filepath="<string>", settings={"foo": "bar"}, subprofiles={child}, baseconfig=configparser.ConfigParser(), weight=3)
+		optimise.flatten_profiles(parent)
+		self.assertDictEqual(grandchild.settings, {"foo": "bar"}, "The foo setting must've been inherited via the child to the grandchild.")
+
 	def test_flatten_profiles_merge(self):
 		"""
 		Tests flattening a profile that inherits one setting from a parent but

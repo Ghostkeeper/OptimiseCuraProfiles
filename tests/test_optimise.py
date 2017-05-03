@@ -73,6 +73,18 @@ class TestOptimise(unittest.TestCase, metaclass=tests.tests.TestMeta):
 		optimise.bubble_common_values(parent, 0)
 		self.assertDictEqual(parent.settings, {}, "The settings should still be empty after bubbling.")
 
+	def test_bubble_common_values_materials(self):
+		"""
+		Tests whether bubbling skips material profiles for non-material
+		settings.
+		"""
+		quality = optimise.Profile(settings={"material_bed_temperature": 70, "layer_height": 0.1337})
+		material = optimise.Profile(settings={"material_bed_temperature": 60, "layer_height": 0.2337}, filepath="/path/to/PLA.inst.cfg", subprofiles=[quality]) #Is a material, because the file is called "PLA".
+		variant = optimise.Profile(settings={"material_bed_temperature": 50, "layer_height": 0.3337}, subprofiles=[material])
+		optimise.bubble_common_values(variant, 0)
+		self.assertDictEqual(variant.settings, {"material_bed_temperature": 70, "layer_height": 0.1337}, "The variant should bubble all values from above.")
+		self.assertDictEqual(material.settings, {"material_bed_temperature": 70, "layer_height": 0.2337}, "The material should bubble only material settings (bed temperature, not layer height).")
+
 	def test_bubble_common_values_skip(self):
 		"""
 		Tests skipping up until some level of profiles.

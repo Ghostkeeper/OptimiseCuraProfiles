@@ -93,7 +93,7 @@ def get_profiles(input_dir):
 	#Find the base file.
 	this_directory = os.path.split(input_dir)[-1]
 	for file in files:
-		if file.split(".")[0] == this_directory: #Named similarly.
+		if is_main_file(file, this_directory): #Named similarly.
 			base_profile = parse(os.path.join(input_dir, file))
 			base_profile.weight = 0
 			break
@@ -107,7 +107,7 @@ def get_profiles(input_dir):
 			base_profile.weight += subprofile.weight
 	else: #Leaf node.
 		for file in files:
-			if file.split(".")[0] == this_directory: #This is the parent file.
+			if is_main_file(file, this_directory): #This is the parent file.
 				continue
 			profile = parse(os.path.join(input_dir, file)) #Act as if every file is in its own subdirectory.
 			base_profile.subprofiles.append(profile)
@@ -262,6 +262,26 @@ def is_material(profile):
 	:return: True if the profile is a material profile, or False if it isn't.
 	"""
 	return os.path.split(profile.filepath)[-1].split(".")[0] in material_profiles
+
+def is_main_file(file_name, directory_name):
+	"""
+	Determines whether a file represent the main node of the directory, or
+	whether it is a subnode.
+
+	It is the main node of a directory when it is named similarly. Specifically,
+	it is the main node if any split on periods would result in the exact same
+	name as the directory.
+	:param file_name: The name of the file to determine whether it is the main
+	file.
+	:param directory_name: The name of the directory of which the file could be
+	the main file.
+	:return: ``True`` if the file is the main file, or ``False`` if it isn't.
+	"""
+	split_file = file_name.split(".")
+	for i in range(len(split_file)):
+		if ".".join(split_file[0:i + 1]) == directory_name:
+			return True
+	return False
 
 def parse(file):
 	"""
